@@ -5,60 +5,80 @@ import {
   TouchableOpacity,
   View,
   Image,
-  ImageBackground,
+  ScrollView,
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
+
 import Music from '../assets/images/music.png';
 import Logo from '../assets/images/logo.png';
-import bgImage from '../assets/images/background.png';
+
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Footer from './Footer';
 
 const Welcome = () => {
   const navigation = useNavigation();
+
+  const card = [
+    {title: 'A Sitar Story - Hanu Dixit'},
+    {title: 'A Sitar Story - Hanu Dixit'},
+    {title: 'A Sitar Story - Hanu Dixit'},
+    {title: 'A Sitar Story - Hanu hanu dixit Dixit'},
+    {title: 'A Sitar Story - Hanu Dixit'},
+    {title: 'A Sitar Story - Hanu Dixit'},
+    {title: 'A Sitar Story - Hanu Dixit'},
+    {title: 'A Sitar Story - Hanu Dixit'},
+  ];
+
   return (
-    <View>
-      <View style={styles.header}>
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            style={styles.sidebarIcon}
-            // onPress={() => setMenuVisible(true)}
-          >
-            <FeatherIcon name="menu" size={20} color={'#FFFFFF'} />
-          </TouchableOpacity>
-          <Image source={Logo} style={styles.logo} />
-          <View style={styles.searchIcon}>
-            <FeatherIcon name="search" size={20} color={'#FFFFFF'} />
-          </View>
-          <View style={styles.searchIcon}>
-            <FeatherIcon name="shopping-bag" size={20} color={'#FFFFFF'} />
+    <ScrollView>
+      <View>
+        <View style={styles.header}>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              style={styles.sidebarIcon}
+              // onPress={() => setMenuVisible(true)}
+            >
+              <FeatherIcon name="menu" size={20} color={'#FFFFFF'} />
+            </TouchableOpacity>
+            <Image source={Logo} style={styles.logo} />
+            <View style={styles.searchIcon}>
+              <FeatherIcon name="search" size={20} color={'#FFFFFF'} />
+            </View>
+            <View style={styles.searchIcon}>
+              <FeatherIcon name="shopping-bag" size={20} color={'#FFFFFF'} />
+            </View>
           </View>
         </View>
 
-        <View>
-          <View style={styles.facetsContainer}>
-            <View style={styles.facets}>
-              <View style={styles.filter}>
-                <FontAwesome6 name="sliders" size={20} />
-              </View>
-              <Text style={styles.facetsLabel}>Filter and sort</Text>
-              <Text style={styles.productCount}>11 products</Text>
+        <View style={styles.facetsContainer}>
+          <View style={styles.facets}>
+            <View style={styles.filter}>
+              <FontAwesome6 name="sliders" size={20} />
             </View>
+            <Text style={styles.facetsLabel}>Filter and sort</Text>
+            <Text style={styles.productCount}>11 products</Text>
           </View>
+        </View>
 
-          <View style={styles.card}>
-            <View>
+        <View style={styles.cardContainer}>
+          {card.map((card, index) => (
+            <View style={styles.card}>
               <View style={styles.imageContainer}>
                 <Image style={styles.cardImage} source={Music} />
               </View>
-              <Text style={styles.heading}>A Sitar Story - Hanu Dixit</Text>
+              <Text style={styles.heading}>{card.title}</Text>
               <Text style={styles.priceItem}>3 credit</Text>
+              <TouchableOpacity style={styles.creditButton}>
+                <Text style={styles.creditButtonText}>Buy Credits</Text>
+              </TouchableOpacity>
             </View>
-          </View>
+          ))}
         </View>
+        <Footer />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -110,6 +130,19 @@ const styles = StyleSheet.create({
     left: 180,
     fontSize: 14,
   },
+
+  cardContainer: {
+    width: 400,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    position: 'relative',
+    marginBottom: 100,
+  },
+  card: {
+    height: 300,
+    width: 180,
+  },
   imageContainer: {
     top: 60,
     left: 40,
@@ -119,14 +152,26 @@ const styles = StyleSheet.create({
     width: 120,
     borderRadius: 60,
   },
-  heading:{
-    top:100,
-    left:20,
-    fontSize:12
+  heading: {
+    top: 100,
+    left: 20,
+    fontSize: 12,
+    height: 30,
   },
-  priceItem:{
-    top:105,
-    left:20,
-    fontSize:16
-  }
+  priceItem: {
+    top: 105,
+    left: 20,
+    fontSize: 16,
+  },
+  creditButton: {
+    height: 40,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#000000',
+    top: 140,
+  },
+  creditButtonText: {
+    textAlign: 'center',
+    top: 10,
+  },
 });
