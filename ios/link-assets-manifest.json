@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Marcellus-Regular.ttf",
+      "sha1": "a83ca5e1e8dbf8316177ff5f2f360ea3e1708981"
+    },
+    {
+      "path": "src/assets/fonts/NunitoSans.ttf",
+      "sha1": "0f4c716c6906c1ac53fb106b307b6cb1a8c1cd4e"
+    },
+    {
+      "path": "src/assets/fonts/NunitoSans_7pt-Regular.ttf",
+      "sha1": "466635ba024c43f741e320148a159557fd732ec0"
+    }
+  ]
+}
