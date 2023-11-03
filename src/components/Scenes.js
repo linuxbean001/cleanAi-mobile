@@ -42,7 +42,7 @@ const Scenes = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Menu menuVisible={menuVisible} setMenuVisible={setMenuVisible}/>
+        {/* <Menu menuVisible={menuVisible} setMenuVisible={setMenuVisible}/> */}
 
         <View style={{display: 'flex', flexDirection: 'row'}}>
           <TouchableOpacity

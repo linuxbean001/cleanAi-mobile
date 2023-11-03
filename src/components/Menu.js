@@ -12,14 +12,15 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 
-const Menu = ({menuVisible,setMenuVisible}) => {
+const Menu = ({menuVisible}) => {
   return (
     <View>
-      <Modal transparent={true} visible={menuVisible}>
+      
+      <Modal transparent={true} visible={menuVisible} onRequestClose={!menuVisible} >
         <View style={styles.modalView}>
-          <Image source={DreamSpace} style={styles.modalDreamImage} />
+          {/* <Image source={DreamSpace} style={styles.modalDreamImage} />
           <TouchableOpacity
-            onPress={() => setMenuVisible(!menuVisible)}
+            // onPress={() => setMenuVisible(!menuVisible)}
             style={styles.ModalClose}>
             <AntDesignIcon name="close" size={24} color="#222222" />
           </TouchableOpacity>
@@ -60,7 +61,7 @@ const Menu = ({menuVisible,setMenuVisible}) => {
                 <AntDesignIcon name="youtube" style={styles.socialIcons} />
               </View>
             </View>
-          </ImageBackground>
+          </ImageBackground> */}
         </View>
       </Modal>
     </View>
@@ -72,8 +73,11 @@ export default Menu;
 const styles = StyleSheet.create({
 
     modalView: {
-        width: 303,
-        height: 812,
+        width: '100%',
+        height: '100%',
+        top:75,
+        borderTopColor:'#FFFFFF',
+        borderWidth:0.2,
         backgroundColor: '#191919',
       },
       modalDreamImage: {

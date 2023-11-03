@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,14 +11,15 @@ import {
 import {useNavigation} from '@react-navigation/native';
 
 import Music from '../assets/images/music.png';
-import Logo from '../assets/images/logo.png';
 
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Footer from './Footer';
+import Header from './Header';
+import Filter from './Filter';
 
 const Welcome = () => {
   const navigation = useNavigation();
+  const [filterVisible,setFilterVisible]=useState(false)
 
   const card = [
     {title: 'A Sitar Story - Hanu Dixit'},
@@ -34,37 +35,23 @@ const Welcome = () => {
   return (
     <ScrollView>
       <View>
-        <View style={styles.header}>
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              style={styles.sidebarIcon}
-              // onPress={() => setMenuVisible(true)}
-            >
-              <FeatherIcon name="menu" size={20} color={'#FFFFFF'} />
-            </TouchableOpacity>
-            <Image source={Logo} style={styles.logo} />
-            <View style={styles.searchIcon}>
-              <FeatherIcon name="search" size={20} color={'#FFFFFF'} />
-            </View>
-            <View style={styles.searchIcon}>
-              <FeatherIcon name="shopping-bag" size={20} color={'#FFFFFF'} />
-            </View>
-          </View>
-        </View>
-
+        <Header />
         <View style={styles.facetsContainer}>
+          <Filter filterVisible={filterVisible} setFilterVisible={setFilterVisible}/>
           <View style={styles.facets}>
-            <View style={styles.filter}>
+            <TouchableOpacity 
+             onPress={()=>setFilterVisible(true)}
+            style={styles.filter}>
               <FontAwesome6 name="sliders" size={20} />
-            </View>
             <Text style={styles.facetsLabel}>Filter and sort</Text>
+            </TouchableOpacity>
             <Text style={styles.productCount}>11 products</Text>
           </View>
         </View>
 
         <View style={styles.cardContainer}>
           {card.map((card, index) => (
-            <View style={styles.card}>
+            <View style={styles.card} key={index}>
               <View style={styles.imageContainer}>
                 <Image style={styles.cardImage} source={Music} />
               </View>
@@ -85,29 +72,6 @@ const Welcome = () => {
 export default Welcome;
 
 const styles = StyleSheet.create({
-  header: {
-    height: 75,
-    width: '100%',
-    backgroundColor: '#121212',
-  },
-  sidebarIcon: {
-    width: 40,
-    height: 40,
-    top: 29,
-    left: 25,
-  },
-  logo: {
-    width: 170,
-    height: 50,
-    top: 10,
-    left: 60,
-  },
-  searchIcon: {
-    width: 40,
-    height: 40,
-    top: 30,
-    left: 100,
-  },
   facetsContainer: {
     height: 40,
   },
@@ -117,16 +81,16 @@ const styles = StyleSheet.create({
     height: 30,
   },
   filter: {
-    top: 50,
+    top: 40,
     left: 20,
   },
   facetsLabel: {
     left: 35,
-    top: 47,
+    bottom: 25,
     fontSize: 18,
   },
   productCount: {
-    top: 50,
+    top: 40,
     left: 180,
     fontSize: 14,
   },
