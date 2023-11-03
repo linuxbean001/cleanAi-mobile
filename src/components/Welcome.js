@@ -16,6 +16,7 @@ import Logo from '../assets/images/logo.png';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Footer from './Footer';
+import AudioPlayer from './AudioPlayer';
 
 const Welcome = () => {
   const navigation = useNavigation();
@@ -70,6 +71,9 @@ const Welcome = () => {
               </View>
               <Text style={styles.heading}>{card.title}</Text>
               <Text style={styles.priceItem}>3 credit</Text>
+              <View style={styles.audioContain}>
+                <AudioPlayer />
+              </View>
               <TouchableOpacity style={styles.creditButton}>
                 <Text style={styles.creditButtonText}>Buy Credits</Text>
               </TouchableOpacity>
@@ -140,12 +144,13 @@ const styles = StyleSheet.create({
     marginBottom: 100,
   },
   card: {
-    height: 300,
     width: 180,
   },
   imageContainer: {
+    flex: 3,
     top: 60,
-    left: 40,
+    alignSelf: 'center',
+    textAlign: 'center'
   },
   cardImage: {
     height: 120,
@@ -153,25 +158,28 @@ const styles = StyleSheet.create({
     borderRadius: 60,
   },
   heading: {
-    top: 100,
-    left: 20,
-    fontSize: 12,
-    height: 30,
+    flex: 1,
+    top: 80,
+    fontSize: 12
   },
   priceItem: {
-    top: 105,
-    left: 20,
+    flex: 1,
+    top: 95,
     fontSize: 16,
   },
   creditButton: {
+    flex: 2,
     height: 40,
     width: '100%',
     borderWidth: 1,
     borderColor: '#000000',
-    top: 140,
+    top: 15,
   },
   creditButtonText: {
     textAlign: 'center',
     top: 10,
   },
+  audioContain: {
+    flex: 2
+  }
 });

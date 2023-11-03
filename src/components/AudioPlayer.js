@@ -57,12 +57,12 @@ const AudioPlayer = () => {
       <TouchableOpacity onPress={playAudio}>
         <Image
           source={isPlaying ? require('../../pause.png') : require('../../play.png')}
-          style={{ width: 22, height: 22 }}
+          style={{ width: 18, height: 18 }}
         />
       </TouchableOpacity>
       <Text style={{ marginLeft: 5 }}>{formatTime(currentTime)}/{formatTime(totalDuration)}</Text>
       <Slider
-        style={{ width: 80 }}
+        style={{ width: 68 }}
         minimumValue={0}
         maximumValue={totalDuration}
         value={progress}
@@ -71,7 +71,7 @@ const AudioPlayer = () => {
       <TouchableOpacity onPress={toggleMute}>
         <Image
           source={isMuted ? require('../../speaker-mute.png') : require('../../speaker.png')}
-          style={{ width: 22, height: 22 }}
+          style={{ width: 18, height: 18 }}
         />
       </TouchableOpacity>
     </View>
@@ -83,11 +83,10 @@ export default AudioPlayer;
 const styles = StyleSheet.create({
   audioContainer: {
     flexDirection: 'row',
-    marginTop: 120,
+    marginTop: 105,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#a2a7a9',
-    width: '50%',
+    backgroundColor: '#c9d3d8',
     height: 50,
     borderRadius: 50,
   },
