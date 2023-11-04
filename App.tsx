@@ -11,6 +11,7 @@ import Scenes from './src/components/Scenes';
 import Scene from './src/components/Scene';
 import ScenePlayOnPhone from './src/components/ScenePlayOnPhone';
 import SceneSettings from './src/components/SceneSettings';
+import Menu from './src/components/Menu';
 
 const Stack = createNativeStackNavigator();
 

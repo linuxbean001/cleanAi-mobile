@@ -14,12 +14,9 @@ import Music from '../assets/images/music.png';
 
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Footer from './Footer';
-<<<<<<< HEAD
 import Header from './Header';
 import Filter from './Filter';
-=======
 import AudioPlayer from './AudioPlayer';
->>>>>>> e2898a464889f1e804c2b94d6e0341a53d367230
 
 const Welcome = () => {
   const navigation = useNavigation();
@@ -108,7 +105,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',
     position: 'relative',
-    marginBottom: 100,
+    marginBottom: 80,
   },
   card: {
     width: 180,

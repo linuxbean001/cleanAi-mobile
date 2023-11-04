@@ -11,12 +11,14 @@ const AudioPlayer = () => {
   const [totalDuration, setTotalDuration] = useState(0);
 
   useEffect(() => {
-    TrackPlayer.add({
-      id: 'trackId',
-      url: require('../../sample-15s.mp3'),
-      title: 'Sample Track',
-      artist: 'Sample Artist',
-      artwork: 'cover.png',
+    TrackPlayer.setupPlayer().then(() => {
+      TrackPlayer.add({
+        id: 'trackId',
+        url: require('../../sample-15s.mp3'),
+        title: 'Sample Track',
+        artist: 'Sample Artist',
+        artwork: 'cover.png',
+      });
     });
   }, []);
 

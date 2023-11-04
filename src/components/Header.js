@@ -6,17 +6,19 @@ import Logo from '../assets/images/logo.png';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Menu from './Menu';
+import { useNavigation } from '@react-navigation/native';
 
 const Header = () => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const navigation = useNavigation();
  
   return (
     <View style={styles.header}>
-      <Menu menuVisible={menuVisible}/>
+      <Menu menuVisible={menuVisible} setMenuVisible={setMenuVisible}/>
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           style={styles.sidebarIcon}
-          onPress={()=>setMenuVisible(!menuVisible)}>
+          onPress={()=>setMenuVisible(true)}>
           <FeatherIcon name="menu" size={20} color={'#FFFFFF'} />
         </TouchableOpacity>
 

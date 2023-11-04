@@ -69,7 +69,7 @@ export default Footer;
 const styles = StyleSheet.create({
   footer: {
     backgroundColor: '#000000',
-    height: 600,
+    height: 580,
   },
   logo: {
     width: 170,
