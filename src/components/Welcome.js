@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-
+import axios from 'axios';
 import Music from '../assets/images/music.png';
 
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -20,42 +20,47 @@ import AudioPlayer from './AudioPlayer';
 
 const Welcome = () => {
   const navigation = useNavigation();
+  const [productData, setProductData] = useState([]);
   const [filterVisible,setFilterVisible]=useState(false)
+  const shopifyApiKey = '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';
+  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
+  const apiVersion = '2023-07';
+  useEffect(() => {
+    const endpoint = `/admin/api/${apiVersion}/products.json`;
+    axios
+      .get(`${shopifyStoreUrl}${endpoint}`, {
+        headers: {
+          'X-Shopify-Access-Token': shopifyApiKey,
+        },
+      })
+      .then(async (response) => {
+        if (response.data.products) {
+          const products = response.data.products;
 
-  const productData = [
-    {
-      id: '1',
-      url: require('../../music/sample-15s.mp3'),
-      title: 'A Sitar Story',
-      artist: 'Hanu Dixit',
-      artwork: 'cover.png',
-      price: 3
-    },
-    {
-      id: '2',
-      url: require('../../music/sample-12s.mp3'),
-      title: 'Bageshri',
-      artist: 'Aditya Verma',
-      artwork: 'cover.png',
-      price: 2
-    },
-    {
-      id: '3',
-      url: require('../../music/sample-15s.mp3'),
-      title: 'Dream It',
-      artist: 'TrackTribe',
-      artwork: 'cover.png',
-      price: 5
-    },
-    {
-      id: '4',
-      url: require('../../music/sample-6s.mp3'),
-      title: 'Flying',
-      artist: 'Track Tribe',
-      artwork: 'cover.png',
-      price: 4
-    }
-  ];
+          // Fetch metafields for each product
+          const productsWithMetafields = await Promise.all(
+            products.map(async (product) => {
+              const metafieldsEndpoint = `/admin/api/${apiVersion}/products/${product.id}/metafields.json`;
+              const metafieldsResponse = await axios.get(
+                `${shopifyStoreUrl}${metafieldsEndpoint}`,
+                {
+                  headers: {
+                    'X-Shopify-Access-Token': shopifyApiKey,
+                  },
+                }
+              );
+              product.metafields = metafieldsResponse.data.metafields;
+              return product;
+            })
+          );
+
+          setProductData(productsWithMetafields);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error);
+      });
+  }, []);
 
   return (
     <ScrollView>
@@ -70,7 +75,7 @@ const Welcome = () => {
               <FontAwesome6 name="sliders" size={20} />
             <Text style={styles.facetsLabel}>Filter and sort</Text>
             </TouchableOpacity>
-            <Text style={styles.productCount}>11 products</Text>
+            <Text style={styles.productCount}>{productData.length} products</Text>
           </View>
         </View>
 
@@ -78,9 +83,13 @@ const Welcome = () => {
           {productData.map((card, index) => (
             <View key={card.id} style={styles.card}>
               <View style={styles.imageContainer}>
-                <Image style={styles.cardImage} source={Music} />
+                {card.image && card.image.src ? (
+                  <Image style={styles.cardImage} source={{ uri: card.image.src }} />
+                ) : (
+                  <Image style={styles.cardImage} source={Music} />
+                )}
               </View>
-              <Text style={styles.heading}>{card.title} - {card.artist}</Text>
+              <Text style={styles.heading}>{card.title}</Text>
               <Text style={styles.priceItem}>{card.price} credit</Text>
               <View style={styles.audioContain}>
                 <AudioPlayer trackData={card} />
