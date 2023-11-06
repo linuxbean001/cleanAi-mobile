@@ -1,4 +1,12 @@
-import {StyleSheet, Text, Modal,View,Image,TouchableOpacity,ImageBackground} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  Modal,
+  View,
+  Image,
+  TouchableOpacity,
+  ImageBackground,
+} from 'react-native';
 import React from 'react';
 
 import Threads from '../assets/images/threads.png';
@@ -6,61 +14,92 @@ import Layer from '../assets/images/Layer.png';
 import DreamSpace from '../assets/images/dream.png';
 import Vector from '../assets/images/Vector.png';
 
-
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import IonIcon from 'react-native-vector-icons/Ionicons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MatrrialIcons from 'react-native-vector-icons/MaterialIcons';
+import IoniconsIcon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
-
-const Menu = ({menuVisible,setMenuVisible}) => {
+const Menu = ({menuVisible, setMenuVisible}) => {
+  const navigation = useNavigation();
   return (
     <View>
-      <Modal transparent={true} visible={menuVisible}>
+      <Modal
+        transparent={true}
+        visible={menuVisible}
+        animationType="slide"
+        onBackdropPress={() => setMenuVisible(false)}>
         <View style={styles.modalView}>
-          <Image source={DreamSpace} style={styles.modalDreamImage} />
           <TouchableOpacity
-            onPress={() => setMenuVisible(!menuVisible)}
+            onPress={() => setMenuVisible(false)}
             style={styles.ModalClose}>
             <AntDesignIcon name="close" size={24} color="#222222" />
           </TouchableOpacity>
-          <Text style={styles.modalText}>Brooklyn Simmons</Text>
-          <Text style={styles.modalEmail}>brooklyn.simmons@email.com</Text>
-          <Text style={styles.modalRemaining}>Remaining credits:</Text>
-          <TouchableOpacity style={styles.modalButton}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={styles.number}>40</Text>
-              <AntDesignIcon name="copyright" style={styles.modalCopyIcon} />
-              <AntDesignIcon name="pluscircleo" style={styles.modalPlusIcon} />
+
+          <TouchableOpacity style={styles.headerDrawer}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={styles.facetsSummaryText}>Home</Text>
             </View>
           </TouchableOpacity>
-          <View style={styles.ModalVectorImage}>
-            <Image source={Vector} />
-          </View>
-          <ImageBackground source={Layer} style={styles.modalBackgroundImage}>
-            <View>
-              <View style={styles.listContainer}>
-                <Text style={styles.listText}>my scenes</Text>
-                <Text style={styles.listText}>account</Text>
-                <Text style={styles.listText}>Settings</Text>
-                <Text style={styles.listText}>Contact</Text>
-              </View>
-              <View style={styles.logoutContainer}>
-                <View style={styles.policyContainer}>
-                  <Text style={styles.policyText}>terms & conditions</Text>
-                  <Text style={styles.policyText}>privacy policy</Text>
-                </View>
-                <Text style={styles.logutText}>Log out</Text>
-              </View>
-              <View style={styles.iconsLayout}>
-                <IonIcon name="logo-tiktok" style={styles.socialIcons} />
-                <IonIcon name="logo-instagram" style={styles.socialIcons} />
-                <FontAwesomeIcon name="facebook" style={styles.socialIcons} />
-                <FontAwesomeIcon name="linkedin" style={styles.socialIcons} />
-                <Image source={Threads} />
-                <AntDesignIcon name="youtube" style={styles.socialIcons} />
-              </View>
+          <TouchableOpacity style={styles.headerDrawer}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={styles.facetsSummaryText}>Dreamscapes</Text>
+              <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
             </View>
-          </ImageBackground>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerDrawer}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={styles.facetsSummaryText}>
+                Meet the Nerdle and team
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerDrawer}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={styles.facetsSummaryText}>Resources</Text>
+              <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerDrawer}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={styles.facetsSummaryText}>Industires</Text>
+              <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerDrawer}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={styles.facetsSummaryText}>Songs</Text>
+            </View>
+          </TouchableOpacity>
+
+          <View style={styles.utilityLinks}>
+            <TouchableOpacity
+            onPress={()=>navigation.navigate('login')}
+            style={styles.account}>
+              <MatrrialIcons name="person-outline" style={styles.accountIcon} />
+              <Text style={styles.login}>Log in</Text>
+            </TouchableOpacity>
+
+            <View style={styles.socialIconsContainer}>
+          <TouchableOpacity>
+            <IoniconsIcon name="logo-facebook" style={styles.socialIcons} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <IoniconsIcon name="logo-instagram" style={styles.socialIcons} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <IoniconsIcon name="logo-youtube" style={styles.socialIcons} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <IoniconsIcon name="logo-tiktok" style={styles.socialIcons} />
+          </TouchableOpacity>
+        </View>
+          </View>
         </View>
       </Modal>
     </View>
@@ -70,168 +109,62 @@ const Menu = ({menuVisible,setMenuVisible}) => {
 export default Menu;
 
 const styles = StyleSheet.create({
-
-    modalView: {
-        width: 303,
-        height: 812,
-        backgroundColor: '#191919',
-      },
-      modalDreamImage: {
-        width: 97,
-        height: 30,
-        top: 50,
-        left: 103,
-      },
-      modalText: {
-        width: 255,
-        height: 26,
-        top: 80,
-        left: 24,
-        fontFamily: 'Marcellus-Regular',
-        fontWeight: '400',
-        fontSize: 20,
-        lineHeight: 26,
-        textAlign: 'center',
-        color: '#F6F6F6',
-        textTransform: 'uppercase',
-      },
-      modalEmail: {
-        width: 255,
-        height: 19,
-        top: 80,
-        left: 24,
-        fontFamily: 'NunitoSans_7pt',
-        fontWeight: '400',
-        fontSize: 14,
-        lineHeight: 19,
-        textAlign: 'center',
-        color: '#F6F6F6',
-      },
-      modalRemaining: {
-        width: 255,
-        height: 19,
-        top: 120,
-        left: 24,
-        fontFamily: 'Marcellus-Regular',
-        fontWeight: '400',
-        fontSize: 12,
-        lineHeight: 19,
-        textAlign: 'center',
-        textTransform: 'uppercase',
-        color: '#F6F6F6',
-      },
-      modalButton: {
-        width: 125,
-        height: 48,
-        top: 125,
-        left: 89,
-        borderRadius: 40,
-        borderWidth: 1,
-        gap: 4,
-        borderColor: '#3D3D3D',
-      },
-      number: {
-        width: 17,
-        height: 16,
-        fontFamily: 'NunitoSans_7pt',
-        fontWeight: '400',
-        fontSize: 14,
-        lineHeight: 16,
-        textAlign: 'center',
-        left: 12,
-        top: 14,
-        color: '#F6F6F6',
-      },
-      modalCopyIcon: {
-        fontSize: 16,
-        left: 16,
-        top: 14,
-        color: '#FFFFFF',
-      },
-      modalPlusIcon: {
-        fontSize: 40,
-        color: '#F6F6F6',
-        left: 43,
-        top: 2.5,
-      },
-      ModalVectorImage: {
-        width: 32,
-        height: 11,
-        left: 140,
-        top: 160,
-      },
-      listContainer: {
-        bottom:20,
-        left:24,
-        width: 255,
-        height: 128,
-        gap: 10,
-      },
-      listText:{
-        height:19,
-        width:255,
-        fontFamily:'NunitoSans',
-        fontWeight:'700',
-        fontSize:14,
-        lineHeight:19,
-        textAlign:'center',
-        color:'#F6F6F6',
-        textTransform:'uppercase',
-        top:25
-        },
-      logoutContainer:{
-        width:255,
-        height:48,
-        gap:16,
-        bottom:220
-      },
-      policyContainer:{
-        width:246,
-        height:16,
-        top:230,
-        justifyContent:'space-between',
-        flexDirection:'row'
-      },
-      policyText:{
-        fontFamily:'NunitoSans_7pt',
-        fontWeight:'700',
-        fontSize:12,
-        lineHeight:17,
-        textAlign:'center',
-        color:'#F6F6F6',
-        textTransform:'uppercase',
-        left:24
-      },
-      logutText:{
-        fontFamily:'NunitoSans_7pt',
-        fontWeight:'700',
-        fontSize:12,
-        lineHeight:17,
-        textAlign:'center',
-        color:'#F6F6F6',
-        textTransform:'uppercase',
-        left:30,
-        top:230
-      },
-      iconsLayout:{
-        width:216,
-        height:24,
-        gap:24,
-        flexDirection:'row',
-        left:50,
-        top:45
-      },
-      socialIcons:{
-        fontSize:16,
-        color:"#D1D1D1",
-        
-      },
-      modalBackgroundImage:{
-        top:220,
-        height:300
-      },
-      ModalClose:{
-        top:29,
-        left:309
-      }
+  modalView: {
+    width: '85%',
+    height: '100%',
+    top: 75,
+    borderTopColor: '#FFFFFF',
+    borderWidth: 0.2,
+    // backgroundColor: '#191919',
+    backgroundColor: '#000000',
+  },
+  headerDrawer: {
+    width: 330,
+    height: 50,
+    gap: 4,
+  },
+  facetsSummaryText: {
+    fontSize: 15,
+    fontWeight: '700',
+    left: 20,
+    height: 26,
+    color: '#FFFFFF',
+  },
+  arrowIcon: {
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  ModalClose: {
+    top: 5,
+    left: 360,
+  },
+  utilityLinks: {
+    height: 100,
+    backgroundColor: '#121212',
+    top:160
+  },
+  account:{
+    flexDirection:'row',
+    top:20,
+    left:20
+  },
+  accountIcon: {
+    color: '#FFFFFF',
+    fontSize: 20,
+  },
+  login:{
+    color:'#FFFFFF',
+    left:10,
+    top:2,
+  },
+  socialIconsContainer: {
+    top: 40,
+    left:24,
+    flexDirection: 'row',
+    gap: 24,
+  },
+  socialIcons: {
+    fontSize: 18,
+    color: '#FFFFFF',
+  },
 });

@@ -10,44 +10,39 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-import BackIcon from 'react-native-vector-icons/Ionicons';
-import ArrowIcon from 'react-native-vector-icons/AntDesign';
-import EmailIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Footer from './Footer';
+import Header from './Header';
 
 const ForgotPassword = () => {
   const navigation = useNavigation();
 
   return (
     <ScrollView>
+      <Header />
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backIcon}
-          onPress={() => navigation.navigate('login')}>
-          <BackIcon name="arrow-back" size={20} color="black" />
-        </TouchableOpacity>
         <View style={styles.heading}>
-          <Text style={styles.headingText}>FORGOT PASSWORD</Text>
+          <Text style={styles.headingText}>Reset your password</Text>
         </View>
         <View style={styles.paragraph}>
           <Text style={styles.paragraphText}>
-            Donec arcu accumsan habitasse duis cons.
+            We will send you an email to reset your password
           </Text>
         </View>
         <View style={styles.form}>
           <View style={styles.fields}>
-            <EmailIcon name="email-outline" size={16} color={'#222222'} />
-            <TextInput style={styles.inputfiield} placeholder="Email address" />
+            <TextInput style={styles.inputfiield} placeholder="Email" />
           </View>
         </View>
-        <TouchableOpacity style={styles.arrowRightContainer}>
-          <ArrowIcon
-            style={styles.arrowRight}
-            name="arrowright"
-            size={32}
-            color="#F6F6F6"
-          />
+        <TouchableOpacity style={styles.submit}>
+          <Text style={styles.submitText}>Submit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+        onPress={()=>navigation.navigate('login')}
+        style={styles.cancel}>
+       <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
       </View>
+      <Footer />
     </ScrollView>
   );
 };
@@ -56,8 +51,7 @@ export default ForgotPassword;
 
 const styles = StyleSheet.create({
   container: {
-    width: 410,
-    height: 710,
+    height: 380,
     backgroundColor: '#F6F6F6',
   },
   backIcon: {
@@ -68,63 +62,72 @@ const styles = StyleSheet.create({
   },
   heading: {
     width: 311,
-    height: 36,
+    height: 40,
     top: 20,
     left: 32,
   },
   headingText: {
-    fontFamily: 'Marcellus-Regular',
     fontWeight: '400',
     fontSize: 30,
     textAlign: 'center',
-    color: '#222222',
+    color: '#121212',
   },
   paragraph: {
     width: 311,
-    height: 19,
-    top: 30,
+    height: 40,
+    top: 45,
     left: 32,
   },
   paragraphText: {
     fontFamily: 'NunitoSans_7pt-Regular',
-    fontWeight: '400',
+    fontWeight: '100',
     fontSize: 14,
     textAlign: 'center',
     color: '#222222',
   },
-
   form: {
     width: 311,
-    height: 320,
+    height: 100,
     left: 32,
-    top: 80,
+    top: 95,
   },
-
   fields: {
-    height: 48,
-    width: 311,
+    height: 45,
+    width: 300,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#5D5D5D',
+    borderWidth: 1,
+    borderColor: '#121212',
   },
   inputfiield: {
     left: 10,
   },
-
-  arrowRightContainer: {
+  submit: {
+    width: 120,
+    height: 45,
+    top:70,
+    left: 120,
+    backgroundColor: '#121212',
+  },
+  submitText: {
+    fontFamily: 'NunitoSans_7pt',
+    fontWeight: '700',
+    fontSize: 14,
+    textAlign: 'center',
+    top: 12,
+    color: '#F6F6F6',
+  },
+  cancel: {
     width: 64,
     height: 64,
-    top: 120,
-    left: 156,
-    borderRadius: 44,
-    backgroundColor: '#222222',
+    top: 90,
+    left: 150,
   },
-  arrowRight: {
-    width: 32,
+  cancelText: {
     height: 32,
     alignSelf: 'center',
-    top: 12,
+    textDecorationLine:'underline',
+    color:'#121212'
   },
 });

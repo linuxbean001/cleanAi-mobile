@@ -10,82 +10,45 @@ import {
   TextInput,
 } from 'react-native';
 
-import BackIcon from 'react-native-vector-icons/Ionicons';
-import EmailIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import PasswordIcon from 'react-native-vector-icons/Feather';
-import AppleIcon from 'react-native-vector-icons/AntDesign';
+import Footer from './Footer';
+import Header from './Header';
 
 const Login = () => {
   const navigation = useNavigation();
   return (
     <ScrollView>
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backIcon}
-        onPress={() => navigation.navigate('Home')}>
-        <BackIcon name="arrow-back" size={20} color="black" />
-      </TouchableOpacity>
-      <View style={styles.heading}>
-        <Text style={styles.headingText}>LOGIN</Text>
-      </View>
-      <View style={styles.paragraph}>
-        <Text style={styles.paragraphText}>
-          Donec arcu accumsan habitasse duis cons.
-        </Text>
-      </View>
-      <View style={styles.options}>
-        <View style={styles.individual}>
-          <Text style={styles.individualText}>INDIVIDUAL</Text>
+      <Header />
+      <View style={styles.container}>
+        <View style={styles.heading}>
+          <Text style={styles.headingText}>Login</Text>
         </View>
-        <View style={styles.organization}>
-          <Text style={styles.organizationText}>ORGANIZATION</Text>
-        </View>
-      </View>
-     
-      <View style={styles.form}>
-          <View style={[styles.fields, styles.fieldsMargin]}>
-            <EmailIcon name="email-outline" size={16} color={'#222222'} />
-            <TextInput style={styles.inputfiield} placeholder="Email address" />
+        <View style={styles.form}>
+          <View style={styles.fields}>
+            <TextInput style={styles.inputfiield} placeholder="Email" />
           </View>
-          <View style={[styles.fields, styles.fieldsMargin]}>
-            <PasswordIcon name="lock" size={16}  color={'#222222'} />
+          <View style={styles.fields}>
             <TextInput style={styles.inputfiield} placeholder="Password" />
           </View>
         </View>
 
-      <TouchableOpacity 
-      onPress={()=>navigation.navigate('forgotPassword')}
-      style={styles.forgotPassword}>
-        <Text style={styles.forgotText}>Forgot password?</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-      onPress={()=>navigation.navigate('scenes')}
-      style={styles.LoginButton}>
-        <Text style={styles.loginText}>LOGIN</Text>
-      </TouchableOpacity>
-      <View>
-        <Text style={styles.loginWith}>Or login with</Text>
-      </View>
-      <TouchableOpacity style={styles.AppleButton}>
-        <View style={styles.AppleContainer}>
-          <AppleIcon name="apple1" size={24} color="#222222" />
-          <Text style={styles.AppleText}>APPLE ID</Text>
-        </View>
-      </TouchableOpacity>
-      <View
-        style={styles.registerLayout}>
-        <Text
-          style={styles.textAccount}>
-          Don't have an account?
-        </Text>
-        <TouchableOpacity onPress={()=>navigation.navigate('register')}>
-          <Text
-            style={styles.register}>
-            Register now
-          </Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('forgotPassword')}
+          style={styles.forgotPassword}>
+          <Text style={styles.forgotText}>Forgot your password ?</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('scenes')}
+          style={styles.signInButton}>
+          <Text style={styles.signInText}>Sign in</Text>
+        </TouchableOpacity>
+      
+          <TouchableOpacity
+           style={styles.account}
+          onPress={() => navigation.navigate('register')}>
+          <Text style={styles.textAccount}>create account</Text>
+          </TouchableOpacity>
       </View>
-    </View>
+      <Footer />
     </ScrollView>
   );
 };
@@ -94,180 +57,80 @@ export default Login;
 
 const styles = StyleSheet.create({
   container: {
-    width: 410,
-    height: 680,
+    height: 380,
     backgroundColor: '#F6F6F6',
-  },
-  backIcon: {
-    width: 40,
-    height: 40,
-    top: 20,
-    left: 16,
   },
   heading: {
     width: 311,
-    height: 36,
+    height: 40,
     top: 20,
     left: 32,
   },
   headingText: {
-    fontFamily: 'Marcellus-Regular',
     fontWeight: '400',
     fontSize: 30,
     textAlign: 'center',
-    color: '#222222',
-  },
-  paragraph: {
-    width: 311,
-    height: 19,
-    top: 30,
-    left: 32,
-  },
-  paragraphText: {
-    fontFamily: 'NunitoSans_7pt-Regular',
-    fontWeight: '400',
-    fontSize: 14,
-    textAlign: 'center',
-    color: '#222222',
-  },
-  options: {
-    width: 375,
-    height: 48,
-    top: 30,
-    padding: (0, 32, 0, 32),
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  individual: {
-    width: 155.5,
-    height: 48,
-    padding: (16, 0, 16, 0),
-    gap: 8,
-    borderBottomWidth: 2,
-  },
-  individualText: {
-    fontFamily: 'NunitoSans_7pt',
-    fontWeight: '700',
-    fontSize: 14,
-    textAlign: 'center',
-    top: 20,
-    color: '#222222',
-  },
-  organization: {
-    width: 155.5,
-    height: 48,
-    padding: (16, 0, 16, 0),
-    gap: 8,
-    borderBottomWidth: 1,
-  },
-  organizationText: {
-    fontFamily: 'NunitoSans_7pt',
-    fontWeight: '400',
-    fontSize: 14,
-    textAlign: 'center',
-    top: 20,
-    color: '#5D5D5D',
+    color: '#121212',
   },
   form: {
     width: 311,
     height: 100,
-    left: 32,
-    top: 80,
+    left: 52,
+    top: 50,
+    gap: 15,
   },
   fields: {
-    height: 48,
-    width: 311,
+    height: 45,
+    width: 300,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#5D5D5D',
+    borderWidth: 1,
+    borderColor: '#121212',
   },
   inputfiield: {
     left: 10,
   },
-  fieldsMargin: {
-    marginTop: 10,
-  },
-  
   forgotPassword: {
-    width: 117,
-    height: 19,
-    top: 120,
-    left: 129,
+    height: 20,
+    top: 60,
+    left: 55,
     textAlign: 'center',
   },
   forgotText: {
-    fontFamily: 'NunitoSans_7pt',
-    fontWeight: '700',
-    fontSize: 14,
-    color: '#222222',
+    fontSize: 13,
+    color: '#121212',
+    textDecorationLine: 'underline',
   },
-  LoginButton: {
-    width: 311,
-    height: 64,
-    top: 150,
-    left: 32,
-    borderRadius: 44,
-    backgroundColor: '#222222',
+  signInButton: {
+    width: 120,
+    height: 45,
+    top: 90,
+    left: 140,
+    backgroundColor: '#121212',
   },
-  loginText: {
+  signInText: {
     fontFamily: 'NunitoSans_7pt',
     fontWeight: '700',
     fontSize: 14,
     textAlign: 'center',
-    top: 20,
+    top: 12,
     color: '#F6F6F6',
   },
-  loginWith: {
-    fontFamily: 'NunitoSans_7pt',
-    fontWeight: '400',
-    fontSize: 14,
-    color: '#5D5D5D',
-    textAlign: 'center',
-    top: 165,
-  },
-  AppleButton: {
-    width: 311,
-    height: 64,
-    top: 180,
-    left: 32,
-    borderRadius: 44,
-    borderWidth: 1,
-  },
-  AppleContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  AppleText: {
-    fontFamily: 'NunitoSans_7pt',
-    fontWeight: '700',
-    fontSize: 14,
-    textAlign: 'center',
-    color: '#222222',
-    left: 5,
-  },
-  registerLayout:{
+  account: {
     display: 'flex',
     flexDirection: 'row',
     alignSelf: 'center',
     width: 239,
     height: 19,
-    top: 210,
+    top: 110,
+    left:70
   },
-  textAccount:{
+  textAccount: {
     fontFamily: 'NunitoSans_7pt',
     fontWeight: '400',
     fontSize: 14,
     color: '#5D5D5D',
+    textDecorationLine:'underline'
   },
-  register:{
-    fontFamily: 'NunitoSans_7pt',
-    fontWeight: '700',
-    fontSize: 14,
-    color: '#222222',
-    left: 4,
-  }
 });
