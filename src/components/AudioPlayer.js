@@ -3,20 +3,17 @@ import { StyleSheet, View, Text, Button, Image, TouchableOpacity } from 'react-n
 import Slider from '@react-native-community/slider';
 import TrackPlayer from 'react-native-track-player';
 
-const AudioPlayer = () => {
+const AudioPlayer = ({trackData}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
-
+  
   useEffect(() => {
-    TrackPlayer.add({
-      id: 'trackId',
-      url: require('../../sample-15s.mp3'),
-      title: 'Sample Track',
-      artist: 'Sample Artist',
-      artwork: 'cover.png',
+    console.log(trackData)
+    TrackPlayer.setupPlayer().then(() => {
+      TrackPlayer.add(trackData);
     });
   }, []);
 
@@ -30,7 +27,6 @@ const AudioPlayer = () => {
   };
 
   const toggleMute = () => {
-    // You can control mute/unmute based on your requirements
     setIsMuted(!isMuted);
   };
 
@@ -54,7 +50,7 @@ const AudioPlayer = () => {
     <View style={styles.audioContainer}>
       <TouchableOpacity onPress={playAudio}>
         <Image
-          source={isPlaying ? require('../../pause.png') : require('../../play.png')}
+          source={isPlaying ? require('../../images/pause.png') : require('../../images/play.png')}
           style={{ width: 18, height: 18 }}
         />
       </TouchableOpacity>
@@ -68,7 +64,7 @@ const AudioPlayer = () => {
       />
       <TouchableOpacity onPress={toggleMute}>
         <Image
-          source={isMuted ? require('../../speaker-mute.png') : require('../../speaker.png')}
+          source={isMuted ? require('../../images/speaker-mute.png') : require('../../images/speaker.png')}
           style={{ width: 18, height: 18 }}
         />
       </TouchableOpacity>
@@ -95,5 +91,3 @@ const formatTime = (time) => {
   const seconds = Math.floor(time % 60);
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
-
-export {};

@@ -21,15 +21,39 @@ import AudioPlayer from './AudioPlayer';
 const Welcome = () => {
   const navigation = useNavigation();
 
-  const card = [
-    {title: 'A Sitar Story - Hanu Dixit'},
-    {title: 'A Sitar Story - Hanu Dixit'},
-    {title: 'A Sitar Story - Hanu Dixit'},
-    {title: 'A Sitar Story - Hanu hanu dixit Dixit'},
-    {title: 'A Sitar Story - Hanu Dixit'},
-    {title: 'A Sitar Story - Hanu Dixit'},
-    {title: 'A Sitar Story - Hanu Dixit'},
-    {title: 'A Sitar Story - Hanu Dixit'},
+  const productData = [
+    {
+      id: '1',
+      url: require('../../music/sample-15s.mp3'),
+      title: 'A Sitar Story',
+      artist: 'Hanu Dixit',
+      artwork: 'cover.png',
+      price: 3
+    },
+    {
+      id: '2',
+      url: require('../../music/sample-12s.mp3'),
+      title: 'Bageshri',
+      artist: 'Aditya Verma',
+      artwork: 'cover.png',
+      price: 2
+    },
+    {
+      id: '3',
+      url: require('../../music/sample-15s.mp3'),
+      title: 'Dream It',
+      artist: 'TrackTribe',
+      artwork: 'cover.png',
+      price: 5
+    },
+    {
+      id: '4',
+      url: require('../../music/sample-6s.mp3'),
+      title: 'Flying',
+      artist: 'Track Tribe',
+      artwork: 'cover.png',
+      price: 4
+    }
   ];
 
   return (
@@ -64,15 +88,15 @@ const Welcome = () => {
         </View>
 
         <View style={styles.cardContainer}>
-          {card.map((card, index) => (
-            <View style={styles.card}>
+          {productData.map((card, index) => (
+            <View key={card.id} style={styles.card}>
               <View style={styles.imageContainer}>
                 <Image style={styles.cardImage} source={Music} />
               </View>
-              <Text style={styles.heading}>{card.title}</Text>
-              <Text style={styles.priceItem}>3 credit</Text>
+              <Text style={styles.heading}>{card.title} - {card.artist}</Text>
+              <Text style={styles.priceItem}>{card.price} credit</Text>
               <View style={styles.audioContain}>
-                <AudioPlayer />
+                <AudioPlayer trackData={card} />
               </View>
               <TouchableOpacity style={styles.creditButton}>
                 <Text style={styles.creditButtonText}>Buy Credits</Text>
