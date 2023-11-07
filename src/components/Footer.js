@@ -1,11 +1,12 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
-
+import {useNavigation} from '@react-navigation/native';
 import Logo from '../assets/images/logo.png';
 
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 
 const Footer = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.footer}>
       <Image source={Logo} style={styles.logo} />
@@ -27,11 +28,11 @@ const Footer = () => {
           <Text style={styles.quickContainerText}>Quick links</Text>
         </View>
         <View style={styles.footerListMenu}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate('login')}>
             <Text style={styles.footerListText}> My Account</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.footerListText}> Songs Library</Text>
+          <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
+            <Text style={styles.footerListText}> Songs</Text>
           </TouchableOpacity>
           <TouchableOpacity>
             <Text style={styles.footerListText}> Buy Credits</Text>

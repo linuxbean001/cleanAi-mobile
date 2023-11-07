@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   View,
@@ -8,15 +8,57 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-
+import axios from 'axios';
 import Footer from './Footer';
 import Header from './Header';
-
+import Toast from 'react-native-toast-message';
 import {useNavigation} from '@react-navigation/native';
 
 const Register = () => {
   const navigation = useNavigation();
-
+  const [fullName, setFullName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const shopifyApiKey = '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';
+  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
+  const apiVersion = '2023-07';
+  const handleRegistration = async () => {
+    try {
+      const customerData = {
+        customer: {
+          first_name: fullName,
+          last_name: lastName,
+          email,
+          password,
+          password_confirmation: password
+        },
+      };
+      const response = await axios.post(
+        `${shopifyStoreUrl}/admin/api/${apiVersion}/customers.json`,
+        customerData,
+        {
+          headers: {
+            'X-Shopify-Access-Token': shopifyApiKey,
+          }
+        }
+      );
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        text1: 'Registration Successful',
+        text2: 'You have successfully registered!',
+      });
+      navigation.navigate('login');
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Registration Failed',
+        text2: error,
+      });
+    }
+  };
   return (
     <ScrollView>
       <Header />
@@ -28,21 +70,43 @@ const Register = () => {
 
         <View style={styles.form}>
           <View style={styles.fields}>
-            <TextInput style={styles.inputfield} placeholder="Full name" />
+            <TextInput
+              style={styles.inputfield}
+              placeholder="Full name"
+              value={fullName}
+              onChangeText={(text) => setFullName(text)}
+            />
           </View>
           <View style={styles.fields}>
-            <TextInput style={styles.inputfield} placeholder="Last name" />
+            <TextInput
+              style={styles.inputfield}
+              placeholder="Last name"
+              value={lastName}
+              onChangeText={(text) => setLastName(text)}
+            />
           </View>
           <View style={styles.fields}>
-            <TextInput style={styles.inputfield} placeholder="Email" />
+            <TextInput
+              style={styles.inputfield}
+              placeholder="Email"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
           </View>
-
           <View style={styles.fields}>
-            <TextInput style={styles.inputfield} placeholder="Password" />
+            <TextInput
+              secureTextEntry={true}
+              style={styles.inputfield}
+              placeholder="Password"
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+            />
           </View>
         </View>
-
-        <TouchableOpacity style={styles.createButton}>
+        <TouchableOpacity
+          onPress={handleRegistration}
+          style={styles.createButton}
+        >
           <Text style={styles.createText}>Create</Text>
         </TouchableOpacity>
       </View>

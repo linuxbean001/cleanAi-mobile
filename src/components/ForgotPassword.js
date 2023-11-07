@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   View,
@@ -9,13 +9,94 @@ import {
   TextInput,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-
+import axios from 'axios';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, gql } from '@apollo/client';
+import Toast from 'react-native-toast-message';
 import Footer from './Footer';
 import Header from './Header';
 
 const ForgotPassword = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [userList, setUserList] = useState([]);
+  const shopifyApiKey = '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';
+  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
+  const apiVersion = '2023-07';
+  const apiEndpoint = `${shopifyStoreUrl}/api/${apiVersion}/graphql.json`;
 
+  const client = new ApolloClient({
+    link: new HttpLink({
+      uri: apiEndpoint,
+      headers: {
+        'X-Shopify-Storefront-Access-Token': 'a8070bbda0a0b98d7188d31dbcf8380e',
+      },
+    }),
+    cache: new InMemoryCache(),
+  });
+  const FORGET_CUSTOMER = gql`
+    mutation customerRecover($email: String!) {
+      customerRecover(email: $email) {
+        customerUserErrors {
+          code
+          field
+          message
+        }
+      }
+    }
+  `;
+  useEffect(() => {
+    const endpoint = `/admin/api/${apiVersion}/customers.json`;
+    axios
+      .get(`${shopifyStoreUrl}${endpoint}`, {
+        headers: {
+          'X-Shopify-Access-Token': shopifyApiKey,
+        },
+      })
+      .then(async (response) => {
+        if (response.data.customers) {
+          const customers = response.data.customers;
+          setUserList(customers);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching customers:', error);
+      });
+  }, []);
+  const handleShopifyForget = () => {
+    const customerWithEmail = userList.find(customer => customer.email === email);
+    if (customerWithEmail) {
+      client.mutate({
+        mutation: FORGET_CUSTOMER,
+        variables: {
+          email: email
+        },
+      }).then(response => {
+        if (response) {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            text1: 'Password Recovery',
+            text2: 'Email sent successfully!',
+          });
+          navigation.navigate('login');
+        } else {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Failed',
+            text2: 'Failed to send recovery email.',
+          });
+        }
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Failed',
+        text2: 'Email does not exists',
+      });
+    }
+  };
   return (
     <ScrollView>
       <Header />
@@ -30,10 +111,18 @@ const ForgotPassword = () => {
         </View>
         <View style={styles.form}>
           <View style={styles.fields}>
-            <TextInput style={styles.inputfiield} placeholder="Email" />
+            <TextInput
+              style={styles.inputfiield}
+              placeholder="Email"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
           </View>
         </View>
-        <TouchableOpacity style={styles.submit}>
+        <TouchableOpacity
+          onPress={handleShopifyForget}
+          style={styles.submit}
+        >
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
         <TouchableOpacity 

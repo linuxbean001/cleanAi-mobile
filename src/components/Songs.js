@@ -18,7 +18,7 @@ import Header from './Header';
 import Filter from './Filter';
 import AudioPlayer from './AudioPlayer';
 
-const Welcome = () => {
+const Songs = () => {
   const navigation = useNavigation();
   const [productData, setProductData] = useState([]);
   const [filterVisible,setFilterVisible]=useState(false)
@@ -106,7 +106,7 @@ const Welcome = () => {
   );
 };
 
-export default Welcome;
+export default Songs;
 
 const styles = StyleSheet.create({
   facetsContainer: {

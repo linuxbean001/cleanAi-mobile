@@ -11,7 +11,7 @@ const AudioPlayer = ({trackData}) => {
   const [totalDuration, setTotalDuration] = useState(0);
   
   useEffect(() => {
-    console.log(trackData)
+    // console.log(trackData)
     TrackPlayer.setupPlayer().then(() => {
       TrackPlayer.add(trackData);
     });
