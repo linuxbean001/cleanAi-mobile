@@ -12,23 +12,23 @@ import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, gql } from '@apollo/client';
 import Toast from 'react-native-toast-message';
-import Footer from './Footer';
-import Header from './Header';
+import Footer from '../Footer';
+import Header from '../Header';
+import config from './../../config/config';
 
 const ForgotPassword = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [userList, setUserList] = useState([]);
-  const shopifyApiKey = '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';
-  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
-  const apiVersion = '2023-07';
-  const apiEndpoint = `${shopifyStoreUrl}/api/${apiVersion}/graphql.json`;
-
+  const [errors, setErrors] = useState({
+    email: ''
+  });
+  const apiEndpoint = `${config.shopifyStoreUrl}/api/${config.apiVersion}/graphql.json`;
   const client = new ApolloClient({
     link: new HttpLink({
       uri: apiEndpoint,
       headers: {
-        'X-Shopify-Storefront-Access-Token': 'a8070bbda0a0b98d7188d31dbcf8380e',
+        'X-Shopify-Storefront-Access-Token': config.shopifyStoreFrontApiKey,
       },
     }),
     cache: new InMemoryCache(),
@@ -45,11 +45,11 @@ const ForgotPassword = () => {
     }
   `;
   useEffect(() => {
-    const endpoint = `/admin/api/${apiVersion}/customers.json`;
+    const endpoint = `/admin/api/${config.apiVersion}/customers.json`;
     axios
-      .get(`${shopifyStoreUrl}${endpoint}`, {
+      .get(`${config.shopifyStoreUrl}${endpoint}`, {
         headers: {
-          'X-Shopify-Access-Token': shopifyApiKey,
+          'X-Shopify-Access-Token': config.shopifyApiKey,
         },
       })
       .then(async (response) => {
@@ -63,38 +63,51 @@ const ForgotPassword = () => {
       });
   }, []);
   const handleShopifyForget = () => {
-    const customerWithEmail = userList.find(customer => customer.email === email);
-    if (customerWithEmail) {
-      client.mutate({
-        mutation: FORGET_CUSTOMER,
-        variables: {
-          email: email
-        },
-      }).then(response => {
-        if (response) {
-          Toast.show({
-            type: 'success',
-            position: 'top',
-            text1: 'Password Recovery',
-            text2: 'Email sent successfully!',
-          });
-          navigation.navigate('login');
-        } else {
-          Toast.show({
-            type: 'error',
-            position: 'top',
-            text1: 'Failed',
-            text2: 'Failed to send recovery email.',
-          });
-        }
-      });
-    } else {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        text1: 'Failed',
-        text2: 'Email does not exists',
-      });
+    setErrors({
+      email: ''
+    });
+    let isValid = true;
+    if (!email || !/^\S+@\S+\.\S+/.test(email)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        email: 'Invalid email address',
+      }));
+      isValid = false;
+    }
+    if (isValid) {
+      const customerWithEmail = userList.find(customer => customer.email === email);
+      if (customerWithEmail) {
+        client.mutate({
+          mutation: FORGET_CUSTOMER,
+          variables: {
+            email: email
+          },
+        }).then(response => {
+          if (response) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              text1: 'Password Recovery',
+              text2: 'Email sent successfully!',
+            });
+            navigation.navigate('login');
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Failed',
+              text2: 'Failed to send recovery email.',
+            });
+          }
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Failed',
+          text2: 'Email does not exists',
+        });
+      }
     }
   };
   return (
@@ -117,6 +130,7 @@ const ForgotPassword = () => {
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
+            <Text style={styles.errorText}>{errors.email}</Text>
           </View>
         </View>
         <TouchableOpacity
@@ -219,4 +233,10 @@ const styles = StyleSheet.create({
     textDecorationLine:'underline',
     color:'#121212'
   },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    position: 'absolute',
+    top: 40
+  }
 });

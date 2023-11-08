@@ -2,10 +2,10 @@ import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './src/components/Login';
 import Songs from './src/components/Songs';
-import Register from './src/components/Register';
-import ForgotPassword from './src/components/ForgotPassword';
+import Login from './src/components/auth/Login';
+import Register from './src/components/auth/Register';
+import ForgotPassword from './src/components/auth/ForgotPassword';
 import Verification from './src/components/Verification';
 import Scenes from './src/components/Scenes';
 import Scene from './src/components/Scene';

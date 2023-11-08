@@ -11,30 +11,29 @@ import {
 import axios from 'axios';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, gql } from '@apollo/client';
 import Toast from 'react-native-toast-message';
-import Footer from './Footer';
-import Header from './Header';
+import Footer from '../Footer';
+import Header from '../Header';
+import config from './../../config/config';
 
 const Login = () => {
   const navigation = useNavigation();
   const [shopName, setShopName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const shopifyApiKey = 'a8070bbda0a0b98d7188d31dbcf8380e';
-  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
-  const apiVersion = '2023-07';
-  const apiEndpoint = `${shopifyStoreUrl}/api/${apiVersion}/graphql.json`;
-
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
+  const apiEndpoint = `${config.shopifyStoreUrl}/api/${config.apiVersion}/graphql.json`;
   const client = new ApolloClient({
     link: new HttpLink({
       uri: apiEndpoint,
       headers: {
-        'X-Shopify-Storefront-Access-Token': shopifyApiKey,
+        'X-Shopify-Storefront-Access-Token': config.shopifyStoreFrontApiKey,
       },
     }),
     cache: new InMemoryCache(),
   });
-
-  // Define a GraphQL mutation for customer login
   const LOGIN_CUSTOMER = gql`
     mutation CustomerLogin($email: String!, $password: String!) {
       customerAccessTokenCreate(input: {
@@ -54,33 +53,54 @@ const Login = () => {
     }
   `;
   const handleShopifyLogin = () => {
-    client.mutate({
-      mutation: LOGIN_CUSTOMER,
-      variables: {
-        email: email,
-        password: password,
-      },
-    }).then(response => {
-      if (response.data.customerAccessTokenCreate.customerAccessToken) {
-        const accessToken = response.data.customerAccessTokenCreate.customerAccessToken.accessToken;
-        if (accessToken) {
-          Toast.show({
-            type: 'success',
-            position: 'top',
-            text1: 'Logged In Successful',
-            text2: 'You have successfully registered!',
-          });
-          navigation.navigate('scenes');
-        }
-      } else {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          text1: 'Login Failed',
-          text2: response.data.customerAccessTokenCreate.customerUserErrors[0].message,
-        });
-      }
+    setErrors({
+      email: '',
+      password: ''
     });
+    let isValid = true;
+    if (!email || !/^\S+@\S+\.\S+/.test(email)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        email: 'Invalid email address',
+      }));
+      isValid = false;
+    }
+    if (!password) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        password: 'Required.',
+      }));
+      isValid = false;
+    }
+    if (isValid) {
+      client.mutate({
+        mutation: LOGIN_CUSTOMER,
+        variables: {
+          email: email,
+          password: password,
+        },
+      }).then(response => {
+        if (response.data.customerAccessTokenCreate.customerAccessToken) {
+          const accessToken = response.data.customerAccessTokenCreate.customerAccessToken.accessToken;
+          if (accessToken) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              text1: 'Logged In Successful',
+              text2: 'You have successfully registered!',
+            });
+            navigation.navigate('scenes');
+          }
+        } else {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Login Failed',
+            text2: response.data.customerAccessTokenCreate.customerUserErrors[0].message,
+          });
+        }
+      });
+    }
   };
   return (
     <ScrollView>
@@ -97,6 +117,7 @@ const Login = () => {
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
+            <Text style={styles.errorText}>{errors.email}</Text>
           </View>
           <View style={styles.fields}>
             <TextInput
@@ -106,6 +127,7 @@ const Login = () => {
               value={password}
               onChangeText={(text) => setPassword(text)}
             />
+            <Text style={styles.errorText}>{errors.password}</Text>
           </View>
         </View>
 
@@ -170,7 +192,7 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     height: 20,
-    top: 60,
+    top: 70,
     left: 55,
     textAlign: 'center',
   },
@@ -210,4 +232,10 @@ const styles = StyleSheet.create({
     color: '#5D5D5D',
     textDecorationLine:'underline'
   },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    position: 'absolute',
+    top: 40
+  }
 });

@@ -11,41 +11,36 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import Music from '../assets/images/music.png';
-
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Footer from './Footer';
 import Header from './Header';
 import Filter from './Filter';
 import AudioPlayer from './AudioPlayer';
+import config from './../config/config';
 
 const Songs = () => {
   const navigation = useNavigation();
   const [productData, setProductData] = useState([]);
   const [filterVisible,setFilterVisible]=useState(false)
-  const shopifyApiKey = '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';
-  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
-  const apiVersion = '2023-07';
   useEffect(() => {
-    const endpoint = `/admin/api/${apiVersion}/products.json`;
+    const endpoint = `/admin/api/${config.apiVersion}/products.json`;
     axios
-      .get(`${shopifyStoreUrl}${endpoint}`, {
+      .get(`${config.shopifyStoreUrl}${endpoint}`, {
         headers: {
-          'X-Shopify-Access-Token': shopifyApiKey,
+          'X-Shopify-Access-Token': config.shopifyApiKey,
         },
       })
       .then(async (response) => {
         if (response.data.products) {
           const products = response.data.products;
-
-          // Fetch metafields for each product
           const productsWithMetafields = await Promise.all(
             products.map(async (product) => {
-              const metafieldsEndpoint = `/admin/api/${apiVersion}/products/${product.id}/metafields.json`;
+              const metafieldsEndpoint = `/admin/api/${config.apiVersion}/products/${product.id}/metafields.json`;
               const metafieldsResponse = await axios.get(
-                `${shopifyStoreUrl}${metafieldsEndpoint}`,
+                `${config.shopifyStoreUrl}${metafieldsEndpoint}`,
                 {
                   headers: {
-                    'X-Shopify-Access-Token': shopifyApiKey,
+                    'X-Shopify-Access-Token': config.shopifyApiKey,
                   },
                 }
               );
@@ -90,9 +85,9 @@ const Songs = () => {
                 )}
               </View>
               <Text style={styles.heading}>{card.title}</Text>
-              <Text style={styles.priceItem}>{card.price} credit</Text>
+              <Text style={styles.priceItem}>{Number(card.variants[0].price).toFixed(0)} credit</Text>
               <View style={styles.audioContain}>
-                <AudioPlayer trackData={card} />
+                <AudioPlayer metafields={card.metafields} trackId={index} />
               </View>
               <TouchableOpacity style={styles.creditButton}>
                 <Text style={styles.creditButtonText}>Buy Credits</Text>

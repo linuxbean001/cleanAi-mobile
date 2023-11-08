@@ -2,19 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Button, Image, TouchableOpacity } from 'react-native';
 import Slider from '@react-native-community/slider';
 import TrackPlayer from 'react-native-track-player';
+import config from './../config/config';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, gql } from '@apollo/client';
 
-const AudioPlayer = ({trackData}) => {
+const AudioPlayer = ({metafields, trackId}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
-  
+  const [trackUrl, setTrackUrl] = useState('');
+  const apiEndpoint = `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/graphql.json`;
+  const client = new ApolloClient({
+    link: new HttpLink({
+      uri: apiEndpoint,
+      headers: {
+        'X-Shopify-Access-Token': config.shopifyApiKey,
+      },
+    }),
+    cache: new InMemoryCache(),
+  });
+  const GET_AUDIO_FILE = gql`
+    query GetAudioFile($gid: ID!) {
+      node(id: $gid) {
+        ... on GenericFile {
+          url
+          mimeType
+        }
+      }
+    }
+  `;
   useEffect(() => {
-    // console.log(trackData)
-    TrackPlayer.setupPlayer().then(() => {
-      TrackPlayer.add(trackData);
-    });
+    if (metafields.length > 0) {
+      TrackPlayer.setupPlayer()
+      client.query({
+        query: GET_AUDIO_FILE,
+        variables: {
+          gid: metafields[0].value
+        },
+      }).then(response => {
+        setTrackUrl(response.data.node.url)
+        TrackPlayer.add({
+          url: response.data.node.url
+        });
+      });
+    }
   }, []);
 
   const playAudio = async () => {

@@ -9,10 +9,11 @@ import {
   TextInput,
 } from 'react-native';
 import axios from 'axios';
-import Footer from './Footer';
-import Header from './Header';
+import Footer from '../Footer';
+import Header from '../Header';
 import Toast from 'react-native-toast-message';
 import {useNavigation} from '@react-navigation/native';
+import config from './../../config/config';
 
 const Register = () => {
   const navigation = useNavigation();
@@ -20,43 +21,83 @@ const Register = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const shopifyApiKey = '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';
-  const shopifyStoreUrl = 'https://clean-ai.myshopify.com';
-  const apiVersion = '2023-07';
+  const [errors, setErrors] = useState({
+    fullName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
   const handleRegistration = async () => {
-    try {
-      const customerData = {
-        customer: {
-          first_name: fullName,
-          last_name: lastName,
-          email,
-          password,
-          password_confirmation: password
-        },
-      };
-      const response = await axios.post(
-        `${shopifyStoreUrl}/admin/api/${apiVersion}/customers.json`,
-        customerData,
-        {
-          headers: {
-            'X-Shopify-Access-Token': shopifyApiKey,
+    setErrors({
+      fullName: '',
+      lastName: '',
+      email: '',
+      password: '',
+    });
+    let isValid = true;
+    if (!fullName) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        fullName: 'Full name is required',
+      }));
+      isValid = false;
+    }
+    if (!lastName) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        lastName: 'Last name is required',
+      }));
+      isValid = false;
+    }
+    if (!email || !/^\S+@\S+\.\S+/.test(email)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        email: 'Invalid email address',
+      }));
+      isValid = false;
+    }
+    if (!password || password.length < 6) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        password: 'Password must be at least 6 characters',
+      }));
+      isValid = false;
+    }
+    if (isValid) {
+      try {
+        const customerData = {
+          customer: {
+            first_name: fullName,
+            last_name: lastName,
+            email,
+            password,
+            password_confirmation: password
+          },
+        };
+        const response = await axios.post(
+          `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/customers.json`,
+          customerData,
+          {
+            headers: {
+              'X-Shopify-Access-Token': config.shopifyApiKey,
+            }
           }
-        }
-      );
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        text1: 'Registration Successful',
-        text2: 'You have successfully registered!',
-      });
-      navigation.navigate('login');
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        text1: 'Registration Failed',
-        text2: error,
-      });
+        );
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Registration Successful',
+          text2: 'You have successfully registered!',
+        });
+        navigation.navigate('login');
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Registration Failed',
+          text2: error,
+        });
+      }
     }
   };
   return (
@@ -76,6 +117,7 @@ const Register = () => {
               value={fullName}
               onChangeText={(text) => setFullName(text)}
             />
+            <Text style={styles.errorText}>{errors.fullName}</Text>
           </View>
           <View style={styles.fields}>
             <TextInput
@@ -84,6 +126,7 @@ const Register = () => {
               value={lastName}
               onChangeText={(text) => setLastName(text)}
             />
+            <Text style={styles.errorText}>{errors.lastName}</Text>
           </View>
           <View style={styles.fields}>
             <TextInput
@@ -92,6 +135,7 @@ const Register = () => {
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
+            <Text style={styles.errorText}>{errors.email}</Text>
           </View>
           <View style={styles.fields}>
             <TextInput
@@ -101,6 +145,7 @@ const Register = () => {
               value={password}
               onChangeText={(text) => setPassword(text)}
             />
+            <Text style={styles.errorText}>{errors.password}</Text>
           </View>
         </View>
         <TouchableOpacity
@@ -169,6 +214,10 @@ const styles = StyleSheet.create({
     left: 140,
     backgroundColor: '#121212',
   },
-
-
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    position: 'absolute',
+    top: 40
+  }
 });
