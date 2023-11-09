@@ -56,7 +56,6 @@ const Songs = () => {
         console.error('Error fetching products:', error);
       });
   }, []);
-
   return (
     <ScrollView>
       <View>
@@ -75,25 +74,31 @@ const Songs = () => {
         </View>
 
         <View style={styles.cardContainer}>
-          {productData.map((card, index) => (
-            <View key={card.id} style={styles.card}>
-              <View style={styles.imageContainer}>
-                {card.image && card.image.src ? (
-                  <Image style={styles.cardImage} source={{ uri: card.image.src }} />
-                ) : (
-                  <Image style={styles.cardImage} source={Music} />
-                )}
-              </View>
-              <Text style={styles.heading}>{card.title}</Text>
-              <Text style={styles.priceItem}>{Number(card.variants[0].price).toFixed(0)} credit</Text>
-              <View style={styles.audioContain}>
-                <AudioPlayer metafields={card.metafields} trackId={index} />
-              </View>
-              <TouchableOpacity style={styles.creditButton}>
-                <Text style={styles.creditButtonText}>Buy Credits</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+          {productData.map((card, index) => {
+            if (card.metafields.length > 0 && card.metafields[0].value) {
+              return (
+                <View key={card.id} style={styles.card}>
+                  <View style={styles.imageContainer}>
+                    {card.image && card.image.src ? (
+                      <Image style={styles.cardImage} source={{ uri: card.image.src }} />
+                    ) : (
+                      <Image style={styles.cardImage} source={Music} />
+                    )}
+                  </View>
+                  <Text style={styles.heading}>{card.title}</Text>
+                  <Text style={styles.priceItem}>{Number(card.variants[0].price).toFixed(0)} credit</Text>
+                  <View style={styles.audioContain}>
+                    <AudioPlayer metafields={card.metafields} trackId={index} />
+                  </View>
+                  <TouchableOpacity style={styles.creditButton}>
+                    <Text style={styles.creditButtonText}>Buy Credits</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            } else {
+              return null; // Or handle the case where metafields[0].value is falsy
+            }
+          })}
         </View>
         <Footer />
       </View>
