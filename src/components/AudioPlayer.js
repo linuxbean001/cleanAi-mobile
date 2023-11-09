@@ -42,9 +42,6 @@ const AudioPlayer = ({metafields, trackId}) => {
         },
       }).then(response => {
         setTrackUrl(response.data.node.url)
-        TrackPlayer.add({
-          url: response.data.node.url
-        });
       });
     }
   }, []);
@@ -53,6 +50,12 @@ const AudioPlayer = ({metafields, trackId}) => {
     if (isPlaying) {
       await TrackPlayer.pause();
     } else {
+      await TrackPlayer.seekTo(0);
+      await TrackPlayer.reset();
+      TrackPlayer.add({
+        id: trackId,
+        url: trackUrl
+      });
       await TrackPlayer.play();
     }
     setIsPlaying(!isPlaying);
