@@ -23,7 +23,8 @@ const Songs = () => {
   const [productData, setProductData] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
-  const [filterVisible,setFilterVisible]=useState(false);
+  const [filterVisible,setFilterVisible]=useState(false)
+  const [filteredData, setFilteredData] = useState([]);
   useEffect(() => {
     const endpoint = `/admin/api/${config.apiVersion}/products.json`;
     axios
@@ -67,6 +68,7 @@ const Songs = () => {
           setProductTags(uniqueArray)
           setProductTypes(uniqueTypes)
           setProductData(productsWithMetafields);
+          setFilteredData(productsWithMetafields);
         }
       })
       .catch((error) => {
@@ -74,18 +76,12 @@ const Songs = () => {
       });
   }, []);
   const applyFilter = (selectedTags, selectedTypes) => {
-    if (selectedTags === null && selectedTypes === null) {
-      setProductData(productData);
-    } else {
-      const filteredProducts = productData.filter((product) => {
-        const hasSelectedTag =
-          selectedTags.length === 0 || selectedTags.some((tag) => product.tags.includes(tag));
-        const hasSelectedType =
-          selectedTypes.length === 0 || selectedTypes.includes(product.product_type);
-        return hasSelectedTag && hasSelectedType;
-      });
-      setProductData(filteredProducts);
-    }
+    const filteredProducts = productData.filter((product) => {
+      const hasSelectedTag = selectedTags.length === 0 || selectedTags.some((tag) => product.tags.includes(tag));
+      const hasSelectedType = selectedTypes.length === 0 || selectedTypes.includes(product.product_type);
+      return hasSelectedTag && hasSelectedType;
+    });
+    setFilteredData(filteredProducts);
   };
   return (
     <ScrollView>
@@ -106,12 +102,12 @@ const Songs = () => {
               <FontAwesome6 name="sliders" size={20} />
             <Text style={styles.facetsLabel}>Filter and sort</Text>
             </TouchableOpacity>
-            <Text style={styles.productCount}>{productData.length} products</Text>
+            <Text style={styles.productCount}>{filteredData.length} products</Text>
           </View>
         </View>
 
         <View style={styles.cardContainer}>
-          {productData.map((card, index) => {
+          {filteredData.map((card, index) => {
             if (card.metafields.length > 0 && card.metafields[0].value) {
               return (
                 <View key={card.id} style={styles.card}>

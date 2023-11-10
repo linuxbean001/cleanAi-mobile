@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -13,11 +13,14 @@ import ScenePlayOnPhone from './src/components/ScenePlayOnPhone';
 import SceneSettings from './src/components/SceneSettings';
 import Menu from './src/components/Menu';
 import Toast from 'react-native-toast-message';
+import TrackPlayer from 'react-native-track-player';
 const Stack = createNativeStackNavigator();
 
 function App() {
-  return (
-   
+  useEffect(() => {
+    TrackPlayer.setupPlayer();
+  }, []);
+  return (   
    <NavigationContainer>
      <Stack.Navigator screenOptions={{headerShown: false}}>
        <Stack.Screen name="songs" component={Songs} />

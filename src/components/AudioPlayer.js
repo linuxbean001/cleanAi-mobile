@@ -34,7 +34,6 @@ const AudioPlayer = ({metafields, trackId}) => {
   `;
   useEffect(() => {
     if (metafields.length > 0) {
-      TrackPlayer.setupPlayer()
       client.query({
         query: GET_AUDIO_FILE,
         variables: {

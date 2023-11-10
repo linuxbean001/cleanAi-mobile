@@ -42,7 +42,7 @@ const Filter = ({filterVisible, setFilterVisible, productTags, productTypes, app
   const handleRemoveAll = () => {
     setCheckedItems(Array(productTags.length).fill(false));
     setCheckedTypes(Array(productTypes.length).fill(false));
-    applyFilter(null, null);
+    applyFilter([], []);
     setFilterVisible(false);
   };
   const handleApply = () => {
