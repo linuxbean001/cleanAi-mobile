@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import React from 'react';
-
+import React, { useState } from 'react';
+import { CheckBox } from 'react-native-elements';
 import Threads from '../assets/images/threads.png';
 import Layer from '../assets/images/Layer.png';
 import DreamSpace from '../assets/images/dream.png';
@@ -18,7 +18,39 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
-const Filter = ({filterVisible, setFilterVisible}) => {
+const Filter = ({filterVisible, setFilterVisible, productTags, productTypes, applyFilter}) => {
+  const [checkedItems, setCheckedItems] = useState(Array(productTags.length).fill(false));
+  const [checkedTypes, setCheckedTypes] = useState(Array(productTypes.length).fill(false));
+  const [isCategoriesOpen, setCategoriesOpen] = useState(true);
+  const [isMusicOpen, setMusicOpen] = useState(false);
+  const handleCheckBoxChange = (index) => {
+    const newCheckedItems = [...checkedItems];
+    newCheckedItems[index] = !newCheckedItems[index];
+    setCheckedItems(newCheckedItems);
+  };
+  const handleCheckBoxTypes = (index) => {
+    const newCheckedItems = [...checkedTypes];
+    newCheckedItems[index] = !newCheckedItems[index];
+    setCheckedTypes(newCheckedItems);
+  };
+  const toggleCategories = () => {
+    setCategoriesOpen(!isCategoriesOpen);
+  };
+  const toggleMusic = () => {
+    setMusicOpen(!isMusicOpen);
+  };
+  const handleRemoveAll = () => {
+    setCheckedItems(Array(productTags.length).fill(false));
+    setCheckedTypes(Array(productTypes.length).fill(false));
+    applyFilter(null, null);
+    setFilterVisible(false);
+  };
+  const handleApply = () => {
+    const selectedTags = productTags.filter((_, index) => checkedItems[index]);
+    const selectedTypes = productTypes.filter((_, index) => checkedTypes[index]);
+    applyFilter(selectedTags, selectedTypes);
+    setFilterVisible(false);
+  };
   return (
     <View>
       <Modal transparent={true} animationType="slide" visible={filterVisible}>
@@ -32,25 +64,52 @@ const Filter = ({filterVisible, setFilterVisible}) => {
               <AntDesignIcon name="close" size={24} color="#121212BF" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.facetsSummary}>
+          <TouchableOpacity style={styles.facetsSummary} onPress={toggleCategories}>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={styles.facetsSummaryText}>Categories</Text>
               <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
             </View>
+            {isCategoriesOpen && (
+              <View style={styles.checkContain}>
+                {productTags.map((tag, index) => (
+                  <CheckBox
+                    key={index}
+                    title={tag}
+                    checked={checkedItems[index]}
+                    onPress={() => handleCheckBoxChange(index)}
+                  />
+                ))}
+              </View>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.facetsSummary}>
+          <TouchableOpacity
+            style={isCategoriesOpen ? styles.facetsSummary1 : styles.facetsSummary}
+            onPress={toggleMusic}
+          >
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={styles.facetsSummaryText}>Music genres</Text>
               <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
             </View>
+            {isMusicOpen && (
+              <View style={styles.checkContain}>
+                {productTypes.map((tag, index) => (
+                  <CheckBox
+                    key={index}
+                    title={tag}
+                    checked={checkedTypes[index]}
+                    onPress={() => handleCheckBoxTypes(index)}
+                  />
+                ))}
+              </View>
+            )}
           </TouchableOpacity>
           <View style={styles.facetsFooter}>
-            <TouchableOpacity style={styles.clearWrapper}>
+            <TouchableOpacity onPress={handleRemoveAll} style={styles.clearWrapper}>
             <Text style={styles.clearText}>Remove all</Text>
             </TouchableOpacity>
-            <TouchableOpacity  style={styles.applyContainer}>
+            <TouchableOpacity onPress={handleApply} style={styles.applyContainer}>
             <Text style={styles.applyText}>Apply</Text>
             </TouchableOpacity>
           </View>
@@ -98,6 +157,12 @@ const styles = StyleSheet.create({
     top: 60,
     gap: 4,
   },
+  facetsSummary1: {
+    width: 330,
+    height: 50,
+    top: 220,
+    gap: 4,
+  },
   facetsSummaryText: {
     fontSize: 15,
     left: 20,
@@ -140,6 +205,9 @@ const styles = StyleSheet.create({
     top:10,
     color:'#FFFFFF'
   },
-
-  
+  checkContain: {
+    position: 'absolute',
+    top: 30,
+    left: 10
+  }  
 });

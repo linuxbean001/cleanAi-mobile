@@ -21,7 +21,9 @@ import config from './../config/config';
 const Songs = () => {
   const navigation = useNavigation();
   const [productData, setProductData] = useState([]);
-  const [filterVisible,setFilterVisible]=useState(false)
+  const [productTags, setProductTags] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  const [filterVisible,setFilterVisible]=useState(false);
   useEffect(() => {
     const endpoint = `/admin/api/${config.apiVersion}/products.json`;
     axios
@@ -33,8 +35,16 @@ const Songs = () => {
       .then(async (response) => {
         if (response.data.products) {
           const products = response.data.products;
+          const tags = []
+          const types = []
           const productsWithMetafields = await Promise.all(
             products.map(async (product) => {
+              if (product.tags !== "") {
+                tags.push(product.tags)
+              }
+              if (product.product_type !== "") {
+                types.push(product.product_type)
+              }
               const metafieldsEndpoint = `/admin/api/${config.apiVersion}/products/${product.id}/metafields.json`;
               const metafieldsResponse = await axios.get(
                 `${config.shopifyStoreUrl}${metafieldsEndpoint}`,
@@ -48,7 +58,14 @@ const Songs = () => {
               return product;
             })
           );
-
+          const uniqueArray = tags.filter((value, index, self) => {
+            return self.indexOf(value) === index;
+          });
+          const uniqueTypes = types.filter((value, index, self) => {
+            return self.indexOf(value) === index;
+          });
+          setProductTags(uniqueArray)
+          setProductTypes(uniqueTypes)
           setProductData(productsWithMetafields);
         }
       })
@@ -56,12 +73,32 @@ const Songs = () => {
         console.error('Error fetching products:', error);
       });
   }, []);
+  const applyFilter = (selectedTags, selectedTypes) => {
+    if (selectedTags === null && selectedTypes === null) {
+      setProductData(productData);
+    } else {
+      const filteredProducts = productData.filter((product) => {
+        const hasSelectedTag =
+          selectedTags.length === 0 || selectedTags.some((tag) => product.tags.includes(tag));
+        const hasSelectedType =
+          selectedTypes.length === 0 || selectedTypes.includes(product.product_type);
+        return hasSelectedTag && hasSelectedType;
+      });
+      setProductData(filteredProducts);
+    }
+  };
   return (
     <ScrollView>
       <View>
         <Header />
         <View style={styles.facetsContainer}>
-          <Filter filterVisible={filterVisible} setFilterVisible={setFilterVisible}/>
+          <Filter
+            filterVisible={filterVisible}
+            setFilterVisible={setFilterVisible}
+            productTags={productTags}
+            productTypes={productTypes}
+            applyFilter={applyFilter}
+          />
           <View style={styles.facets}>
             <TouchableOpacity 
              onPress={()=>setFilterVisible(true)}
