@@ -123,7 +123,7 @@ const Songs = () => {
                   <View style={styles.audioContain}>
                     <AudioPlayer metafields={card.metafields} trackId={index} />
                   </View>
-                  <TouchableOpacity style={styles.creditButton}>
+                  <TouchableOpacity onPress={()=>navigation.navigate('plans')} style={styles.creditButton}>
                     <Text style={styles.creditButtonText}>Buy Credits</Text>
                   </TouchableOpacity>
                 </View>
