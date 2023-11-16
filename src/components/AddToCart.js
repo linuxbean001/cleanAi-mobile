@@ -18,6 +18,7 @@ const AddToCart = ({route, navigation}) => {
   const loadCartCount = async () => {
     try {
       const storedCartCount = await AsyncStorage.getItem('cartCount');
+      const cartItems = await AsyncStorage.getItem('cartItems');
       setCartCount(parseInt(storedCartCount) || 0);
     } catch (error) {
       console.error('Error loading cart count:', error);
@@ -33,7 +34,27 @@ const AddToCart = ({route, navigation}) => {
     }
   };
 
-  const toggleModal = () => {
+  const saveCartItem = async (price, plan) => {
+    try {
+      const cartItems = await AsyncStorage.getItem('cartItems');
+      let items = [];
+      if (cartItems) {
+        items = JSON.parse(cartItems);
+      }
+      const existingItemIndex = items.findIndex((item) => item.plan === plan);
+      if (existingItemIndex !== -1) {
+        items[existingItemIndex].count += 1;
+      } else {
+        items.push({ price, plan, count: 1 });
+      }
+
+      await AsyncStorage.setItem('cartItems', JSON.stringify(items));
+    } catch (error) {
+      console.error('Error saving cart item:', error);
+    }
+  };
+
+  const toggleModal = async () => {
     if (isModalVisible) {
       Animated.parallel([
         Animated.timing(opacity, {
@@ -47,9 +68,12 @@ const AddToCart = ({route, navigation}) => {
           useNativeDriver: true,
         }),
       ]).start(() => setModalVisible(false));
+      // await AsyncStorage.removeItem('cartItems');
+      // await AsyncStorage.removeItem('cartCount');
     } else {
       const newCartCount = cartCount + 1;
       saveCartCount(newCartCount);
+      saveCartItem(price, plan);
       setModalVisible(true);
       Animated.parallel([
         Animated.timing(opacity, {
@@ -65,6 +89,22 @@ const AddToCart = ({route, navigation}) => {
       ]).start();
     }
   };
+
+  const goCart = () => {
+    navigation.navigate('cart', { price: price, plan: plan })
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: -300,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setModalVisible(false));
+  }
   return (
     <>
       <ScrollView>
@@ -96,6 +136,7 @@ const AddToCart = ({route, navigation}) => {
               <Text style={styles.modalText}>Item added to your cart</Text>
               <Text style={styles.modalText}>{plan}</Text>
               <TouchableOpacity
+                onPress={()=> goCart() }
                 style={styles.viewCart}>
                 <Text style={styles.viewText}>View cart ({cartCount})</Text>
               </TouchableOpacity>

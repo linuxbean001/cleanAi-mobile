@@ -14,6 +14,7 @@ import SceneSettings from './src/components/SceneSettings';
 import Menu from './src/components/Menu';
 import Plans from './src/components/Plans';
 import AddToCart from './src/components/AddToCart';
+import Cart from './src/components/Cart';
 import Toast from 'react-native-toast-message';
 import TrackPlayer from 'react-native-track-player';
 const Stack = createNativeStackNavigator();
@@ -28,6 +29,7 @@ function App() {
        <Stack.Screen name="songs" component={Songs} />
        <Stack.Screen name="plans" component={Plans} />
        <Stack.Screen name="addtocart" component={AddToCart} />
+       <Stack.Screen name="cart" component={Cart} />
        <Stack.Screen name="login" component={Login} />
        <Stack.Screen name="register" component={Register} />
        <Stack.Screen name="forgotPassword" component={ForgotPassword} />
