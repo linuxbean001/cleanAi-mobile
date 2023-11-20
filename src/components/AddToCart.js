@@ -17,20 +17,16 @@ const AddToCart = ({route, navigation}) => {
 
   const loadCartCount = async () => {
     try {
-      const storedCartCount = await AsyncStorage.getItem('cartCount');
       const cartItems = await AsyncStorage.getItem('cartItems');
-      setCartCount(parseInt(storedCartCount) || 0);
+      if (cartItems) {
+        const items = JSON.parse(cartItems);
+        const totalCartCount = items.reduce((acc, item) => acc + item.count, 0);
+        setCartCount(totalCartCount);
+      } else {
+        setCartCount(0);
+      }
     } catch (error) {
       console.error('Error loading cart count:', error);
-    }
-  };
-
-  const saveCartCount = async (newCartCount) => {
-    try {
-      await AsyncStorage.setItem('cartCount', newCartCount.toString());
-      setCartCount(newCartCount);
-    } catch (error) {
-      console.error('Error saving cart count:', error);
     }
   };
 
@@ -49,6 +45,7 @@ const AddToCart = ({route, navigation}) => {
       }
 
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
+      setCartCount((prevCount) => prevCount + 1);
     } catch (error) {
       console.error('Error saving cart item:', error);
     }
@@ -71,9 +68,8 @@ const AddToCart = ({route, navigation}) => {
       // await AsyncStorage.removeItem('cartItems');
       // await AsyncStorage.removeItem('cartCount');
     } else {
-      const newCartCount = cartCount + 1;
-      saveCartCount(newCartCount);
       saveCartItem(price, plan);
+      await loadCartCount();
       setModalVisible(true);
       Animated.parallel([
         Animated.timing(opacity, {
@@ -90,8 +86,9 @@ const AddToCart = ({route, navigation}) => {
     }
   };
 
-  const goCart = () => {
-    navigation.navigate('cart', { price: price, plan: plan })
+  const goCart = async () => {
+    navigation.navigate('cart', { price: price, plan: plan });
+    await loadCartCount();
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 0,
