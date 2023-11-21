@@ -16,6 +16,7 @@ import Plans from './src/components/Plans';
 import AddToCart from './src/components/AddToCart';
 import Cart from './src/components/Cart';
 import Paypal from './src/components/Paypal';
+import Checkout from './src/components/Checkout';
 import Toast from 'react-native-toast-message';
 import TrackPlayer from 'react-native-track-player';
 const Stack = createNativeStackNavigator();
@@ -32,6 +33,7 @@ function App() {
        <Stack.Screen name="addtocart" component={AddToCart} />
        <Stack.Screen name="cart" component={Cart} />
        <Stack.Screen name="paypal" component={Paypal} />
+       <Stack.Screen name="checkout" component={Checkout} />
        <Stack.Screen name="login" component={Login} />
        <Stack.Screen name="register" component={Register} />
        <Stack.Screen name="forgotPassword" component={ForgotPassword} />

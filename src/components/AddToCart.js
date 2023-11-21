@@ -138,6 +138,7 @@ const AddToCart = ({route, navigation}) => {
                 <Text style={styles.viewText}>View cart ({cartCount})</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={()=>navigation.navigate('checkout')}
                 style={styles.checkout}>
                 <Text style={styles.checkText}>Check out</Text>
               </TouchableOpacity>
