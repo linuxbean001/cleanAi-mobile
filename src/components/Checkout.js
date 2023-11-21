@@ -14,7 +14,7 @@ const Checkout = () => {
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [check1, setCheck1] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState('creditCard');
   useEffect(() => {
     loadCartItems();
   }, []);
@@ -33,9 +33,6 @@ const Checkout = () => {
   };
   const calculateEstimatedTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.count, 0);
-  };
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option === selectedOption ? null : option);
   };
   return (
     <>
@@ -120,16 +117,57 @@ const Checkout = () => {
             <Text style={styles.transText}>All transactions are secure and encrypted.</Text>
           </View>
           <View>
-            <TextInput
-              style={styles.inputField}
-              placeholder="Email or mobile phone number"
-            />
             <CheckBox
-              checked={check1}
-              onPress={() => setCheck1(!check1)}
-              title="Email me with news and offers"
-              titleProps={{ style: styles.checkboxTitle }}
+              title="Credit Card"
+              checked={selectedOption === 'creditCard'}
+              onPress={() => setSelectedOption('creditCard')}
+              checkedIcon="dot-circle-o"
+              uncheckedIcon="circle-o"
+              checkedColor="#abaf51"
+              uncheckedColor="#e5e5e5"
+              containerStyle={{
+                backgroundColor: selectedOption === 'creditCard' ? '#f7f8e5' : 'white',
+                borderWidth: 0
+              }}
             />
+            {selectedOption === 'creditCard' && (
+              <View style={styles.additionalDetails}>
+                <TextInput
+                  style={styles.inputFieldCard}
+                  placeholder="Card number"
+                />
+                <TextInput
+                  style={styles.inputFieldCard}
+                  placeholder="Expiration date (MM / YY)"
+                />
+                <TextInput
+                  style={styles.inputFieldCard}
+                  placeholder="Security code"
+                />
+                <TextInput
+                  style={styles.inputFieldCard}
+                  placeholder="Name on card"
+                />
+              </View>
+            )}
+            <CheckBox
+              title="PayPal"
+              checked={selectedOption === 'paypal'}
+              onPress={() => setSelectedOption('paypal')}
+              checkedIcon="dot-circle-o"
+              uncheckedIcon="circle-o"
+              checkedColor="#abaf51"
+              uncheckedColor="#e5e5e5"
+              containerStyle={{
+                backgroundColor: selectedOption === 'paypal' ? '#f7f8e5' : 'white',
+                borderWidth: 0
+              }}
+            />
+            {selectedOption === 'paypal' && (
+              <View style={styles.additionalDetails}>
+                <Text style={styles.additionalDetailsText}>After clicking "Pay with PayPal", you will be redirected to PayPal to complete your purchase securely.</Text>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -318,6 +356,28 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 16,
     color: '#000'
+  },
+  additionalDetails: {
+    backgroundColor: '#f4f4f4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15
+  },
+  additionalDetailsText: {
+    textAlign: 'center'
+  },
+  inputFieldCard: {
+    width: 350,
+    height: 50,
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft: 15,
+    marginRight: 15,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    borderColor: '#ddd',
+    backgroundColor: 'white'
   }
 });
 
