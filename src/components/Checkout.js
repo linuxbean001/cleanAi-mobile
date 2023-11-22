@@ -8,13 +8,16 @@ import Dummy from '../assets/images/dummy.png';
 import PaypalImage from '../assets/images/paypalButton.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckBox } from 'react-native-elements';
+import { Picker } from '@react-native-picker/picker';
 
 const Checkout = () => {
   const navigation = useNavigation();
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [showOrderSummary1, setShowOrderSummary1] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [check1, setCheck1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('creditCard');
+  const [selectedValue, setSelectedValue] = useState('');
   useEffect(() => {
     loadCartItems();
   }, []);
@@ -31,8 +34,14 @@ const Checkout = () => {
   const toggleOrderSummary = () => {
     setShowOrderSummary(!showOrderSummary);
   };
+  const toggleOrderSummary1 = () => {
+    setShowOrderSummary1(!showOrderSummary1);
+  };
   const calculateEstimatedTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.count, 0);
+  };
+  const calculateEstimatedCount = () => {
+    return cartItems.reduce((total, item) => total + item.count, 0);
   };
   return (
     <>
@@ -81,7 +90,7 @@ const Checkout = () => {
           <View style={styles.cardEmptyBtn}>
             <TouchableOpacity
               onPress={()=>navigation.navigate('paypal', { paypalPrice: calculateEstimatedTotal() })}
-              style={styles.shoppingBtn}>
+            >
               <Image style={styles.selectPaypalBtn} source={PaypalImage} />
             </TouchableOpacity>
           </View>
@@ -127,7 +136,8 @@ const Checkout = () => {
               uncheckedColor="#e5e5e5"
               containerStyle={{
                 backgroundColor: selectedOption === 'creditCard' ? '#f7f8e5' : 'white',
-                borderWidth: 0
+                borderColor: selectedOption === 'creditCard' ? '#abaf51' : '#e5e5e5',
+                borderWidth: 2
               }}
             />
             {selectedOption === 'creditCard' && (
@@ -160,7 +170,8 @@ const Checkout = () => {
               uncheckedColor="#e5e5e5"
               containerStyle={{
                 backgroundColor: selectedOption === 'paypal' ? '#f7f8e5' : 'white',
-                borderWidth: 0
+                borderColor: selectedOption === 'paypal' ? '#abaf51' : '#e5e5e5',
+                borderWidth: 2
               }}
             />
             {selectedOption === 'paypal' && (
@@ -169,6 +180,97 @@ const Checkout = () => {
               </View>
             )}
           </View>
+          <View style={styles.cardPaymentSection}>
+            <Text style={styles.billingText}>Billing address</Text>
+          </View>
+          <View style={styles.billingDetails}>
+            <View style={styles.countryBox}>
+              <Picker
+                style={{ height: 50, width: 380 }}
+                selectedValue={selectedValue}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+              >
+                <Picker.Item label="Country/Region" value="" />
+                <Picker.Item label="Option 1" value="option1" />
+                <Picker.Item label="Option 2" value="option2" />
+                <Picker.Item label="Option 3" value="option3" />
+              </Picker>
+            </View>
+            <TextInput
+              style={styles.inputFieldBill}
+              placeholder="First name (optional)"
+            />
+            <TextInput
+              style={styles.inputFieldBill}
+              placeholder="Last name"
+            />
+            <TextInput
+              style={styles.inputFieldBill}
+              placeholder="Address"
+            />
+            <TextInput
+              style={styles.inputFieldBill}
+              placeholder="City"
+            />
+            <View style={styles.countryBox}>
+              <Picker
+                style={{ height: 50, width: 380 }}
+                selectedValue={selectedValue}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+              >
+                <Picker.Item label="State" value="" />
+                <Picker.Item label="Option 1" value="option1" />
+                <Picker.Item label="Option 2" value="option2" />
+                <Picker.Item label="Option 3" value="option3" />
+              </Picker>
+            </View>
+            <TextInput
+              style={styles.inputFieldBill}
+              placeholder="ZIP code"
+            />
+          </View>
+        </View>
+        <View style={styles.cardPayment}>
+          <View style={styles.shopOrders}>
+            <Text style={styles.paymentText}>Order summary ({calculateEstimatedCount()})</Text>
+            <TouchableOpacity onPress={toggleOrderSummary1}>
+              <View>
+                <Text style={styles.orderSummary}>
+                  {showOrderSummary1 ? 'Hide' : 'Show'}{' '}
+                  <FontAwesome6 name={showOrderSummary1 ? 'chevron-up' : 'chevron-down'} color="#abaf51" size={12} />
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          {showOrderSummary1 && (
+            <View>
+              {cartItems.map((item, index) => (
+                <View key={index} style={styles.listItem}>
+                  <View style={styles.itemImageContainer}>
+                    <Image source={Dummy} style={styles.itemImage} />
+                    <Text style={styles.itemCount}>{item.count}</Text>
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName}>{item.plan}</Text>
+                  </View>
+                  <Text style={styles.itemPrice}>${Number(item.price * item.count).toFixed(2)}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          <View style={styles.totalContainer}>
+            <Text style={styles.totalText}>Total</Text>
+            <Text style={styles.totalAmount}><Text style={styles.amountUsd}>USD</Text> ${calculateEstimatedTotal().toFixed(2)}</Text>
+          </View>
+          <View style={styles.paymentBtn}>
+            <TouchableOpacity
+              style={styles.shoppingBtn}>
+              <Text style={styles.shoppingText}>Pay now</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.cardFooter}>
+          <Text style={styles.footerText}>All rights reserved Clean AI</Text>
         </View>
       </ScrollView>
     </> 
@@ -180,7 +282,7 @@ const styles = StyleSheet.create({
     padding: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#ccc',
     borderBottomStyle: 'solid'
   },
@@ -314,6 +416,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 25,
+    fontWeight: 'bold',
     color: '#000'
   },
   loginText: {
@@ -350,6 +453,7 @@ const styles = StyleSheet.create({
   },
   paymentText: {
     fontSize: 25,
+    fontWeight: 'bold',
     color: '#000'
   },
   transText: {
@@ -361,7 +465,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f4f4f4',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 15
+    padding: 15,
+    borderWidth: 0.3,
+    borderColor: 'gray',
+    marginTop: -5,
+    marginLeft: 11,
+    marginRight: 11
   },
   additionalDetailsText: {
     textAlign: 'center'
@@ -378,6 +487,64 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: '#ddd',
     backgroundColor: 'white'
+  },
+  billingText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000'
+  },
+  billingDetails: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  inputFieldBill: {
+    width: 380,
+    height: 50,
+    marginTop: 5,
+    marginBottom: 5,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    borderColor: '#ddd',
+    backgroundColor: 'white'
+  },
+  countryBox: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 5,
+    borderRadius: 5
+  },
+  shopOrders: {
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  shoppingBtn: {
+    width: 380,
+    padding: 15,
+    backgroundColor: '#abaf51',
+    alignSelf: 'center',
+    borderRadius: 5
+  },
+  shoppingText: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center'
+  },
+  cardFooter: {
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopWidth: 0.3,
+    borderBottomColor: '#ccc',
+    borderBottomStyle: 'solid',
+    backgroundColor: 'white'
+  },
+  footerText: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    fontSize: 15,
+    color: '#000'
   }
 });
 
