@@ -340,14 +340,15 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    color: '#000'
   },
   itemBadge: {
     fontSize: 12,
     color: '#abaf51',
   },
   itemPrice: {
-    fontSize: 16
+    fontSize: 16,
+    color: '#000'
   },
   totalContainer: {
     flexDirection: 'row',
@@ -435,7 +436,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
-    borderColor: '#ddd'
+    borderColor: '#ddd',
+    color: '#000'
   },
   checkboxTitle: {
     color: '#000',
@@ -473,7 +475,8 @@ const styles = StyleSheet.create({
     marginRight: 11
   },
   additionalDetailsText: {
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#000'
   },
   inputFieldCard: {
     width: 350,
@@ -486,7 +489,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     borderColor: '#ddd',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    color: '#000'
   },
   billingText: {
     fontSize: 20,
@@ -506,7 +510,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     borderColor: '#ddd',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    color: '#000'
   },
   countryBox: {
     borderWidth: 1,

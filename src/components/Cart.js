@@ -110,7 +110,7 @@ const Cart = ({ title, description, price }) => {
             <Text style={styles.totalCrd}>{calculateEstimatedTotal()} Credit</Text>
           </View>
           <View style={styles.cardBottomText}>
-            <Text>Taxes, discounts and shipping calculated at checkout</Text>
+            <Text style={styles.cardBottomText2}>Taxes, discounts and shipping calculated at checkout</Text>
           </View>
           <View style={styles.cardBottomText1}>
             <Text style={styles.bottomText1}>Please apply credits to Download this song (if available into your AC), click on credit button</Text>
@@ -156,11 +156,13 @@ const styles = StyleSheet.create({
   continue: {
     marginTop: 10,
     fontSize: 17,
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    color: '#000'
   },
   productTotal: {
     marginTop: 10,
-    fontSize: 15
+    fontSize: 15,
+    color: '#323436'
   },
   productName: {
     marginTop: 10,
@@ -205,6 +207,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     paddingHorizontal: 8,
     fontSize: 16,
+    color: '#000'
   },
   buttonDelete: {
     position: 'absolute',
@@ -227,7 +230,8 @@ const styles = StyleSheet.create({
   },
   totalCrd: {
     marginLeft: 20,
-    fontSize: 15
+    fontSize: 15,
+    color: '#323436'
   },
   cardBottomText: {
     marginTop: -20,
@@ -235,6 +239,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     fontSize: 16,
+    color: '#000'
+  },
+  cardBottomText2: {
     color: '#000'
   },
   cardBottomText1: {

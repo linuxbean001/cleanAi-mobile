@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
   },
   inputfiield: {
     left: 10,
+    color: '#000'
   },
   submit: {
     width: 120,

@@ -99,7 +99,7 @@ const Songs = () => {
             <TouchableOpacity 
              onPress={()=>setFilterVisible(true)}
             style={styles.filter}>
-              <FontAwesome6 name="sliders" size={20} />
+              <FontAwesome6 name="sliders" color="#000" size={20} />
             <Text style={styles.facetsLabel}>Filter and sort</Text>
             </TouchableOpacity>
             <Text style={styles.productCount}>{filteredData.length} products</Text>
@@ -158,11 +158,13 @@ const styles = StyleSheet.create({
     left: 35,
     bottom: 25,
     fontSize: 18,
+    color: '#000'
   },
   productCount: {
     top: 40,
     left: 180,
     fontSize: 14,
+    color: '#000'
   },
 
   cardContainer: {
@@ -190,12 +192,14 @@ const styles = StyleSheet.create({
   heading: {
     flex: 1,
     top: 80,
-    fontSize: 12
+    fontSize: 12,
+    color: '#000'
   },
   priceItem: {
     flex: 1,
     top: 95,
     fontSize: 16,
+    color: '#000'
   },
   creditButton: {
     flex: 2,
@@ -208,6 +212,7 @@ const styles = StyleSheet.create({
   creditButtonText: {
     textAlign: 'center',
     top: 10,
+    color: '#000'
   },
   audioContain: {
     flex: 2

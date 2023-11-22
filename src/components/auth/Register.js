@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
   },
   inputfield: {
     left: 10,
+    color: '#000'
   },
   createText: {
     fontFamily: 'NunitoSans_7pt',

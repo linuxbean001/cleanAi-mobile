@@ -77,7 +77,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top', 
     fontSize: superFontSize, 
     lineHeight: superlineHeight,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: '#000'
   },
   price: {
     textAlignVertical: 'bottom', 
