@@ -168,12 +168,11 @@ const styles = StyleSheet.create({
   },
 
   cardContainer: {
-    width: 400,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',
     position: 'relative',
-    marginBottom: 80,
+    marginBottom: 80
   },
   card: {
     width: 180,
