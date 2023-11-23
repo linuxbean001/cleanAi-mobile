@@ -100,7 +100,7 @@ const Songs = () => {
              onPress={()=>setFilterVisible(true)}
             style={styles.filter}>
               <FontAwesome6 name="sliders" color="#000" size={20} />
-            <Text style={styles.facetsLabel}>Filter and sort</Text>
+            <Text style={styles.facetsLabel}>Filter</Text>
             </TouchableOpacity>
             <Text style={styles.productCount}>{filteredData.length} products</Text>
           </View>
@@ -147,12 +147,13 @@ const styles = StyleSheet.create({
   },
   facets: {
     flexDirection: 'row',
-    width: 290,
+    justifyContent: 'space-between',
     height: 30,
+    marginLeft: 20,
+    marginRight: 20
   },
   filter: {
     top: 40,
-    left: 20,
   },
   facetsLabel: {
     left: 35,
@@ -162,7 +163,6 @@ const styles = StyleSheet.create({
   },
   productCount: {
     top: 40,
-    left: 180,
     fontSize: 14,
     color: '#000'
   },
