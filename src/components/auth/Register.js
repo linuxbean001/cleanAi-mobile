@@ -114,6 +114,7 @@ const Register = () => {
             <TextInput
               style={styles.inputfield}
               placeholder="Full name"
+              placeholderTextColor="#000"
               value={fullName}
               onChangeText={(text) => setFullName(text)}
             />
@@ -123,6 +124,7 @@ const Register = () => {
             <TextInput
               style={styles.inputfield}
               placeholder="Last name"
+              placeholderTextColor="#000"
               value={lastName}
               onChangeText={(text) => setLastName(text)}
             />
@@ -132,6 +134,7 @@ const Register = () => {
             <TextInput
               style={styles.inputfield}
               placeholder="Email"
+              placeholderTextColor="#000"
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
@@ -142,6 +145,7 @@ const Register = () => {
               secureTextEntry={true}
               style={styles.inputfield}
               placeholder="Password"
+              placeholderTextColor="#000"
               value={password}
               onChangeText={(text) => setPassword(text)}
             />

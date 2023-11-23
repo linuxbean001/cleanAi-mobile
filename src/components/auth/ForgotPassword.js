@@ -127,6 +127,7 @@ const ForgotPassword = () => {
             <TextInput
               style={styles.inputfiield}
               placeholder="Email"
+              placeholderTextColor="#000"
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
@@ -164,10 +165,11 @@ const styles = StyleSheet.create({
     left: 16,
   },
   heading: {
-    width: 311,
-    height: 40,
     top: 20,
-    left: 32,
+    marginLeft: 45,
+    marginRight: 45,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   headingText: {
     fontWeight: '400',
@@ -176,10 +178,12 @@ const styles = StyleSheet.create({
     color: '#121212',
   },
   paragraph: {
-    width: 311,
-    height: 40,
+    marginLeft: 45,
+    marginRight: 45,
     top: 45,
-    left: 32,
+    marginBottom: -20,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   paragraphText: {
     fontFamily: 'NunitoSans_7pt-Regular',
@@ -189,10 +193,10 @@ const styles = StyleSheet.create({
     color: '#222222',
   },
   form: {
-    width: 311,
     height: 100,
-    left: 32,
     top: 95,
+    flexDirection: 'row',
+    justifyContent: 'center'
   },
   fields: {
     height: 45,
@@ -208,11 +212,13 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   submit: {
-    width: 120,
+    marginLeft: 120,
+    marginRight: 120,
     height: 45,
-    top:70,
-    left: 120,
+    top:60,
     backgroundColor: '#121212',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   submitText: {
     fontFamily: 'NunitoSans_7pt',
@@ -223,10 +229,10 @@ const styles = StyleSheet.create({
     color: '#F6F6F6',
   },
   cancel: {
-    width: 64,
     height: 64,
-    top: 90,
-    left: 150,
+    top: 60,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   cancelText: {
     height: 32,

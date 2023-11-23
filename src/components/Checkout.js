@@ -6,9 +6,12 @@ import Footer from './Footer';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Dummy from '../assets/images/dummy.png';
 import PaypalImage from '../assets/images/paypalButton.png';
+import PayWithImage from '../assets/images/paywithpaypal.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckBox } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
+import config from './../config/config';
+import axios from 'axios';
 
 const Checkout = () => {
   const navigation = useNavigation();
@@ -18,9 +21,72 @@ const Checkout = () => {
   const [check1, setCheck1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('creditCard');
   const [selectedValue, setSelectedValue] = useState('');
+  const [selectedStateValue, setSelectedStateValue] = useState('');
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [statesShow, setStatesShow] = useState(true);
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expirationDate, setExpirationDate] = useState('');
+  const [securityCode, setSecurityCode] = useState('');
+  const [cardHolderName, setCardHolderName] = useState('');
+  const [cardNumberError, setCardNumberError] = useState('');
+  const [expirationDateError, setExpirationDateError] = useState('');
+  const [securityCodeError, setSecurityCodeError] = useState('');
+  const [cardHolderNameError, setCardHolderNameError] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [address, setAddress] = useState('');
+  const [addressError, setAddressError] = useState('');
+  const [city, setCity] = useState('');
+  const [cityError, setCityError] = useState('');
+  const [zipcode, setZipcode] = useState('');
+  const [zipcodeError, setZipcodeError] = useState('');
   useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(
+          `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/countries.json`, 
+          {
+            headers: {
+              'X-Shopify-Access-Token': config.shopifyApiKey
+            }
+          }
+        );
+        const countriesData = response.data.countries.map(country => ({
+          label: country.name,
+          value: country.code,
+          provinces: country.provinces
+        }));
+        setCountries(countriesData);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+      }
+    };
+    fetchCountries();
     loadCartItems();
   }, []);
+
+  const handleCountryChange = async (countryCode) => {
+    try {
+      const selectedCountry = countries.find(country => country.value === countryCode);
+      if (selectedCountry) {
+        if (selectedCountry.provinces && selectedCountry.provinces.length > 0) {
+          const statesData = selectedCountry.provinces.map(province => ({
+            label: province.name,
+            value: province.code,
+          }));
+          setStates(statesData);
+          setStatesShow(true);
+        } else {
+          setStatesShow(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching states:', error);
+    }
+  };
 
   const loadCartItems = async () => {
     try {
@@ -42,6 +108,55 @@ const Checkout = () => {
   };
   const calculateEstimatedCount = () => {
     return cartItems.reduce((total, item) => total + item.count, 0);
+  };
+
+  const handlePayNow = () => {
+    let errors = {};
+    if (!email.trim()) {
+      errors.email = 'Enter an email or phone number';
+    }
+    if (selectedOption === 'creditCard') {
+      if (!cardNumber.trim()) {
+        errors.cardNumber = 'Enter a card number';
+      }
+      if (!expirationDate.trim()) {
+        errors.expirationDate = 'Enter a valid expiration date';
+      }
+      if (!securityCode.trim()) {
+        errors.securityCode = 'Enter the CVV or security code on your card';
+      }
+      if (!cardHolderName.trim()) {
+        errors.cardHolderName = 'Enter your name exactly as it’s written on your card';
+      }
+    }
+    if (!lastName.trim()) {
+      errors.lastName = 'Enter a last name';
+    }
+    if (!address.trim()) {
+      errors.address = 'Enter an address';
+    }
+    if (!city.trim()) {
+      errors.city = 'Enter a city';
+    }
+    if (!zipcode.trim()) {
+      errors.zipcode = 'Enter a ZIP / postal code';
+    }
+    if (Object.keys(errors).length > 0) {
+      setEmailError(errors.email || '');
+      setCardNumberError(errors.cardNumber || '');
+      setExpirationDateError(errors.expirationDate || '');
+      setSecurityCodeError(errors.securityCode || '');
+      setCardHolderNameError(errors.cardHolderName || '');
+      setLastNameError(errors.lastName || '');
+      setAddressError(errors.address || '');
+      setCityError(errors.city || '');
+      setZipcodeError(errors.zipcode || '');
+      return;
+    } else {
+      if (selectedOption === 'paypal') {
+        navigation.navigate('paypal', { paypalPrice: calculateEstimatedTotal() })
+      }
+    }
   };
   return (
     <>
@@ -109,9 +224,21 @@ const Checkout = () => {
           </View>
           <View>
             <TextInput
-              style={styles.inputField}
+              style={[
+                styles.inputField,
+                { borderColor: emailError ? 'red' : '#ddd' }
+              ]}
               placeholder="Email or mobile phone number"
+              placeholderTextColor="#000"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailError('');
+              }}
             />
+            {emailError ? (
+              <Text style={styles.errorOuterText}>{emailError}</Text>
+            ) : null}
             <CheckBox
               checked={check1}
               onPress={() => setCheck1(!check1)}
@@ -143,21 +270,69 @@ const Checkout = () => {
             {selectedOption === 'creditCard' && (
               <View style={styles.additionalDetails}>
                 <TextInput
-                  style={styles.inputFieldCard}
+                  style={[
+                    styles.inputFieldCard,
+                    { borderColor: cardNumberError ? 'red' : '#ddd' }
+                  ]}
                   placeholder="Card number"
+                  placeholderTextColor="#000"
+                  value={cardNumber}
+                  onChangeText={(text) => {
+                    setCardNumber(text);
+                    setCardNumberError('');
+                  }}
                 />
+                {cardNumberError ? (
+                  <Text style={styles.errorText}>{cardNumberError}</Text>
+                ) : null}
                 <TextInput
-                  style={styles.inputFieldCard}
+                  style={[
+                    styles.inputFieldCard,
+                    { borderColor: expirationDateError ? 'red' : '#ddd' }
+                  ]}
                   placeholder="Expiration date (MM / YY)"
+                  placeholderTextColor="#000"
+                  value={expirationDate}
+                  onChangeText={(text) => {
+                    setExpirationDate(text);
+                    setExpirationDateError('');
+                  }}
                 />
+                {expirationDateError ? (
+                  <Text style={styles.errorText}>{expirationDateError}</Text>
+                ) : null}
                 <TextInput
-                  style={styles.inputFieldCard}
+                  style={[
+                    styles.inputFieldCard,
+                    { borderColor: securityCodeError ? 'red' : '#ddd' }
+                  ]}
                   placeholder="Security code"
+                  placeholderTextColor="#000"
+                  value={securityCode}
+                  onChangeText={(text) => {
+                    setSecurityCode(text);
+                    setSecurityCodeError('');
+                  }}
                 />
+                {securityCodeError ? (
+                  <Text style={styles.errorText}>{securityCodeError}</Text>
+                ) : null}
                 <TextInput
-                  style={styles.inputFieldCard}
+                  style={[
+                    styles.inputFieldCard,
+                    { borderColor: cardHolderNameError ? 'red' : '#ddd' }
+                  ]}
                   placeholder="Name on card"
+                  placeholderTextColor="#000"
+                  value={cardHolderName}
+                  onChangeText={(text) => {
+                    setCardHolderName(text);
+                    setCardHolderNameError('');
+                  }}
                 />
+                {cardHolderNameError ? (
+                  <Text style={styles.errorText}>{cardHolderNameError}</Text>
+                ) : null}
               </View>
             )}
             <CheckBox
@@ -188,46 +363,98 @@ const Checkout = () => {
               <Picker
                 style={{ height: 50, width: 380 }}
                 selectedValue={selectedValue}
-                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+                onValueChange={(itemValue, itemIndex) => {
+                  setSelectedValue(itemValue);
+                  handleCountryChange(itemValue);
+                }}
               >
-                <Picker.Item label="Country/Region" value="" />
-                <Picker.Item label="Option 1" value="option1" />
-                <Picker.Item label="Option 2" value="option2" />
-                <Picker.Item label="Option 3" value="option3" />
+                {countries.map((country, index) => (
+                  <Picker.Item key={index} label={country.label} value={country.value} />
+                ))}
               </Picker>
             </View>
             <TextInput
               style={styles.inputFieldBill}
               placeholder="First name (optional)"
+              placeholderTextColor="#000"
             />
             <TextInput
-              style={styles.inputFieldBill}
+              style={[
+                styles.inputFieldBill,
+                { borderColor: lastNameError ? 'red' : '#ddd' }
+              ]}
               placeholder="Last name"
+              placeholderTextColor="#000"
+              value={lastName}
+              onChangeText={(text) => {
+                setLastName(text);
+                setLastNameError('');
+              }}
             />
+            {lastNameError ? (
+              <Text style={styles.errorOuterText}>{lastNameError}</Text>
+            ) : null}
             <TextInput
-              style={styles.inputFieldBill}
+              style={[
+                styles.inputFieldBill,
+                { borderColor: addressError ? 'red' : '#ddd' }
+              ]}
               placeholder="Address"
+              placeholderTextColor="#000"
+              value={address}
+              onChangeText={(text) => {
+                setAddress(text);
+                setAddressError('');
+              }}
             />
+            {addressError ? (
+              <Text style={styles.errorOuterText}>{addressError}</Text>
+            ) : null}
             <TextInput
-              style={styles.inputFieldBill}
+              style={[
+                styles.inputFieldBill,
+                { borderColor: cityError ? 'red' : '#ddd' }
+              ]}
               placeholder="City"
+              placeholderTextColor="#000"
+              value={city}
+              onChangeText={(text) => {
+                setCity(text);
+                setCityError('');
+              }}
             />
-            <View style={styles.countryBox}>
-              <Picker
-                style={{ height: 50, width: 380 }}
-                selectedValue={selectedValue}
-                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-              >
-                <Picker.Item label="State" value="" />
-                <Picker.Item label="Option 1" value="option1" />
-                <Picker.Item label="Option 2" value="option2" />
-                <Picker.Item label="Option 3" value="option3" />
-              </Picker>
-            </View>
+            {cityError ? (
+              <Text style={styles.errorOuterText}>{cityError}</Text>
+            ) : null}
+            {statesShow ? (
+              <View style={styles.countryBox}>
+                <Picker
+                  style={{ height: 50, width: 380 }}
+                  selectedValue={selectedStateValue}
+                  onValueChange={(itemValue, itemIndex) => setSelectedStateValue(itemValue)}
+                >
+                  {states.map((state, index) => (
+                    <Picker.Item key={index} label={state.label} value={state.value} />
+                  ))}
+                </Picker>
+              </View>
+            ) : null}
             <TextInput
-              style={styles.inputFieldBill}
+              style={[
+                styles.inputFieldBill,
+                { borderColor: zipcodeError ? 'red' : '#ddd' }
+              ]}
               placeholder="ZIP code"
+              placeholderTextColor="#000"
+              value={zipcode}
+              onChangeText={(text) => {
+                setZipcode(text);
+                setZipcodeError('');
+              }}
             />
+            {zipcodeError ? (
+              <Text style={styles.errorOuterText}>{zipcodeError}</Text>
+            ) : null}
           </View>
         </View>
         <View style={styles.cardPayment}>
@@ -263,10 +490,17 @@ const Checkout = () => {
             <Text style={styles.totalAmount}><Text style={styles.amountUsd}>USD</Text> ${calculateEstimatedTotal().toFixed(2)}</Text>
           </View>
           <View style={styles.paymentBtn}>
-            <TouchableOpacity
-              style={styles.shoppingBtn}>
-              <Text style={styles.shoppingText}>Pay now</Text>
-            </TouchableOpacity>
+            {selectedOption === 'creditCard' ? (
+              <TouchableOpacity
+                onPress={handlePayNow}
+                style={styles.shoppingBtn}>
+                <Text style={styles.shoppingText}>Pay now</Text>
+              </TouchableOpacity>
+            ) : <TouchableOpacity
+                  onPress={handlePayNow}
+                >
+                  <Image style={styles.selectPayWithBtn} source={PayWithImage} />
+                </TouchableOpacity>}
           </View>
         </View>
         <View style={styles.cardFooter}>
@@ -516,6 +750,7 @@ const styles = StyleSheet.create({
   countryBox: {
     borderWidth: 1,
     borderColor: '#ddd',
+    marginTop: 5,
     marginBottom: 5,
     borderRadius: 5
   },
@@ -536,6 +771,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center'
   },
+  selectPayWithBtn: {
+    width: 380,
+    height: 60,
+    alignSelf: 'center'
+  },
   cardFooter: {
     padding: 15,
     flexDirection: 'row',
@@ -550,6 +790,18 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     fontSize: 15,
     color: '#000'
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginLeft: 8,
+    alignSelf: 'flex-start'
+  },
+  errorOuterText: {
+    color: 'red',
+    fontSize: 14,
+    marginLeft: 15,
+    alignSelf: 'flex-start'
   }
 });
 

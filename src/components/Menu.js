@@ -32,51 +32,14 @@ const Menu = ({menuVisible, setMenuVisible}) => {
           <TouchableOpacity
             onPress={() => setMenuVisible(false)}
             style={styles.ModalClose}>
-            <AntDesignIcon name="close" size={24} color="#222222" />
+            <AntDesignIcon name="close" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.headerDrawer}>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={styles.facetsSummaryText}>Home</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerDrawer}>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={styles.facetsSummaryText}>Dreamscapes</Text>
-              <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerDrawer}>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={styles.facetsSummaryText}>
-                Meet the Nerdle and team
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerDrawer}>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={styles.facetsSummaryText}>Resources</Text>
-              <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerDrawer}>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={styles.facetsSummaryText}>Industires</Text>
-              <AntDesignIcon name="arrowright" style={styles.arrowIcon} />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerDrawer}>
+          <TouchableOpacity onPress={()=>navigation.navigate('songs')} style={styles.headerDrawer}>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={styles.facetsSummaryText}>Songs</Text>
             </View>
           </TouchableOpacity>
-
           <View style={styles.utilityLinks}>
             <TouchableOpacity
             onPress={()=>navigation.navigate('login')}
@@ -86,19 +49,19 @@ const Menu = ({menuVisible, setMenuVisible}) => {
             </TouchableOpacity>
 
             <View style={styles.socialIconsContainer}>
-          <TouchableOpacity>
-            <IoniconsIcon name="logo-facebook" style={styles.socialIcons} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <IoniconsIcon name="logo-instagram" style={styles.socialIcons} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <IoniconsIcon name="logo-youtube" style={styles.socialIcons} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <IoniconsIcon name="logo-tiktok" style={styles.socialIcons} />
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity>
+                <IoniconsIcon name="logo-facebook" style={styles.socialIcons} />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <IoniconsIcon name="logo-instagram" style={styles.socialIcons} />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <IoniconsIcon name="logo-youtube" style={styles.socialIcons} />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <IoniconsIcon name="logo-tiktok" style={styles.socialIcons} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -110,22 +73,23 @@ export default Menu;
 
 const styles = StyleSheet.create({
   modalView: {
-    width: '85%',
+    width: '100%',
     height: '100%',
     top: 75,
     borderTopColor: '#FFFFFF',
     borderWidth: 0.2,
-    // backgroundColor: '#191919',
     backgroundColor: '#000000',
   },
   headerDrawer: {
     width: 330,
     height: 50,
     gap: 4,
+    marginTop: 20,
+    position: 'relative'
   },
   facetsSummaryText: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '400',
     left: 20,
     height: 26,
     color: '#FFFFFF',
@@ -135,13 +99,15 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   ModalClose: {
-    top: 5,
+    top: 20,
     left: 360,
+    position: 'absolute'
   },
   utilityLinks: {
     height: 100,
     backgroundColor: '#121212',
-    top:160
+    marginTop: 'auto',
+    marginBottom: 100
   },
   account:{
     flexDirection:'row',
