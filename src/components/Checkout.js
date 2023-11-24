@@ -127,8 +127,10 @@ const Checkout = () => {
 
   const handlePayNow = () => {
     let errors = {};
-    if (!email.trim()) {
-      errors.email = 'Enter an email or phone number';
+    if (userDetails === null) {
+      if (!email.trim()) {
+        errors.email = 'Enter an email or phone number';
+      }
     }
     if (selectedOption === 'creditCard') {
       if (!cardNumber.trim()) {
@@ -147,9 +149,9 @@ const Checkout = () => {
     if (!lastName.trim()) {
       errors.lastName = 'Enter a last name';
     }
-    if (!address.trim()) {
-      errors.address = 'Enter an address';
-    }
+    // if (!address.trim()) {
+    //   errors.address = 'Enter an address';
+    // }
     if (!city.trim()) {
       errors.city = 'Enter a city';
     }
@@ -163,7 +165,7 @@ const Checkout = () => {
       setSecurityCodeError(errors.securityCode || '');
       setCardHolderNameError(errors.cardHolderName || '');
       setLastNameError(errors.lastName || '');
-      setAddressError(errors.address || '');
+      // setAddressError(errors.address || '');
       setCityError(errors.city || '');
       setZipcodeError(errors.zipcode || '');
       return;
@@ -677,6 +679,7 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   loginText: {
+    color: '#000',
     fontSize: 15
   },
   loginText1: {
