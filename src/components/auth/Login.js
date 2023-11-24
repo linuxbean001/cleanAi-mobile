@@ -14,6 +14,7 @@ import Toast from 'react-native-toast-message';
 import Footer from '../Footer';
 import Header from '../Header';
 import config from './../../config/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -89,7 +90,7 @@ const Login = () => {
               text1: 'Logged In Successful',
               text2: 'You have successfully registered!',
             });
-            navigation.navigate('scenes');
+            fetchCustomerDetails(accessToken);
           }
         } else {
           Toast.show({
@@ -101,6 +102,37 @@ const Login = () => {
         }
       });
     }
+  };
+  const fetchCustomerDetails = (accessToken) => {
+    const GET_CUSTOMER_DETAILS = gql`
+      query GetCustomerDetails($customerAccessToken: String!) {
+        customer(customerAccessToken: $customerAccessToken) {
+          id
+          firstName
+          lastName
+          email
+        }
+      }
+    `;
+    const headers = {
+      'X-Shopify-Customer-Access-Token': accessToken,
+    };
+    client
+      .query({
+        query: GET_CUSTOMER_DETAILS,
+        variables: {
+          customerAccessToken: accessToken,
+        },
+        headers: headers,
+      })
+      .then(async(response) => {
+        const customerDetails = response.data.customer;
+        await AsyncStorage.setItem('userDetail', JSON.stringify(customerDetails));
+        navigation.navigate('dashboard');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   return (
     <ScrollView>

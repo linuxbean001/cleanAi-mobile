@@ -1,12 +1,20 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {useNavigation} from '@react-navigation/native';
 import Logo from '../assets/images/logo.png';
-
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Footer = () => {
   const navigation = useNavigation();
+  const goToAccount = async () => {
+    const userDetail = await AsyncStorage.getItem('userDetail');
+    if (userDetail) {
+      navigation.navigate('dashboard')
+    } else {
+      navigation.navigate('login')
+    }
+  }
   return (
     <View style={styles.footer}>
       <Image source={Logo} style={styles.logo} />
@@ -28,13 +36,13 @@ const Footer = () => {
           <Text style={styles.quickContainerText}>Quick links</Text>
         </View>
         <View style={styles.footerListMenu}>
-          <TouchableOpacity onPress={()=>navigation.navigate('login')}>
+          <TouchableOpacity onPress={()=> goToAccount()}>
             <Text style={styles.footerListText}> My Account</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
             <Text style={styles.footerListText}> Songs</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate('plans')}>
             <Text style={styles.footerListText}> Buy Credits</Text>
           </TouchableOpacity>
         </View>

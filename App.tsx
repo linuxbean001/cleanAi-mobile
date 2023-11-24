@@ -7,8 +7,7 @@ import Login from './src/components/auth/Login';
 import Register from './src/components/auth/Register';
 import ForgotPassword from './src/components/auth/ForgotPassword';
 import Verification from './src/components/Verification';
-import Scenes from './src/components/Scenes';
-import Scene from './src/components/Scene';
+import Dashboard from './src/components/Dashboard';
 import ScenePlayOnPhone from './src/components/ScenePlayOnPhone';
 import SceneSettings from './src/components/SceneSettings';
 import Menu from './src/components/Menu';
@@ -38,10 +37,7 @@ function App() {
        <Stack.Screen name="register" component={Register} />
        <Stack.Screen name="forgotPassword" component={ForgotPassword} />
        <Stack.Screen name="verification" component={Verification} />
-       <Stack.Screen name="scenes" component={Scenes} />
-       <Stack.Screen name="scene" component={Scene} />
-       <Stack.Screen name="scenePlayOnPhone" component={ScenePlayOnPhone} />
-       <Stack.Screen name="sceneSettings" component={SceneSettings} />
+       <Stack.Screen name="dashboard" component={Dashboard} />
      </Stack.Navigator>
      <Toast />
    </NavigationContainer>

@@ -3,9 +3,25 @@ import { Image, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView 
 import {useNavigation} from '@react-navigation/native';
 import Header from './Header';
 import Footer from './Footer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CartEmpty = () => {
   const navigation = useNavigation();
+  const [userDetails, setUserDetails] = useState(null);
+  useEffect(() => {
+    loadUserData();
+  }, []);
+  const loadUserData = async () => {
+    try {
+      const userDetail = await AsyncStorage.getItem('userDetail');
+      if (userDetail) {
+        const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+        setUserDetails(parsedUser);
+      }
+    } catch (error) {
+      console.error('Error loading cart count:', error);
+    }
+  };
   return (
     <>
       <View style={styles.cardEmptyTop}>
@@ -18,7 +34,8 @@ const CartEmpty = () => {
           <Text style={styles.shoppingText}>Continue shopping</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.cardBottomText}>
+      {userDetails ? (<><View style={styles.cardBottomText}>
+      </View></>):(<><View style={styles.cardBottomText}>
         <Text style={styles.accountText}>Have an account?</Text>
       </View>
       <View style={styles.cardBottomText1}>
@@ -26,7 +43,7 @@ const CartEmpty = () => {
           <Text style={styles.loginText}>Log in</Text>
         </TouchableOpacity>
         <Text style={styles.bottomText1}>to check out faster.</Text>
-      </View>
+      </View></>)}
     </> 
   );
 };

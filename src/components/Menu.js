@@ -8,19 +8,24 @@ import {
   ImageBackground,
 } from 'react-native';
 import React from 'react';
-
 import Threads from '../assets/images/threads.png';
 import Layer from '../assets/images/Layer.png';
 import DreamSpace from '../assets/images/dream.png';
 import Vector from '../assets/images/Vector.png';
-
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MatrrialIcons from 'react-native-vector-icons/MaterialIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
-const Menu = ({menuVisible, setMenuVisible}) => {
+const Menu = ({menuVisible, setMenuVisible, userDetails}) => {
   const navigation = useNavigation();
+  const goToAccount = () => {
+    if (userDetails) {
+      navigation.navigate('dashboard')
+    } else {
+      navigation.navigate('login')
+    }
+  }
   return (
     <View>
       <Modal
@@ -42,10 +47,14 @@ const Menu = ({menuVisible, setMenuVisible}) => {
           </TouchableOpacity>
           <View style={styles.utilityLinks}>
             <TouchableOpacity
-            onPress={()=>navigation.navigate('login')}
+            onPress={()=> goToAccount()}
             style={styles.account}>
               <MatrrialIcons name="person-outline" style={styles.accountIcon} />
-              <Text style={styles.login}>Log in</Text>
+              {userDetails ? (
+                <Text style={styles.login}>Account</Text>
+              ):(
+                <Text style={styles.login}>Log in</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.socialIconsContainer}>

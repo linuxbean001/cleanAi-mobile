@@ -65,8 +65,6 @@ const AddToCart = ({route, navigation}) => {
           useNativeDriver: true,
         }),
       ]).start(() => setModalVisible(false));
-      // await AsyncStorage.removeItem('cartItems');
-      // await AsyncStorage.removeItem('cartCount');
     } else {
       saveCartItem(price, plan);
       await loadCartCount();

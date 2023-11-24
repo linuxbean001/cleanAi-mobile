@@ -12,11 +12,13 @@ import { CheckBox } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
 import config from './../config/config';
 import axios from 'axios';
+import Autocomplete from './Autocomplete';
 
 const Checkout = () => {
   const navigation = useNavigation();
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showOrderSummary1, setShowOrderSummary1] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [check1, setCheck1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('creditCard');
@@ -43,6 +45,7 @@ const Checkout = () => {
   const [cityError, setCityError] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [zipcodeError, setZipcodeError] = useState('');
+  const [userDetails, setUserDetails] = useState(null);
   useEffect(() => {
     const fetchCountries = async () => {
       try {
@@ -93,6 +96,11 @@ const Checkout = () => {
       const storedCartItems = await AsyncStorage.getItem('cartItems');
       const parsedCartItems = storedCartItems ? JSON.parse(storedCartItems) : [];
       setCartItems(parsedCartItems);
+      const userDetail = await AsyncStorage.getItem('userDetail');
+      if (userDetail) {
+        const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+        setUserDetails(parsedUser);
+      }
     } catch (error) {
       console.error('Error loading cart count:', error);
     }
@@ -102,6 +110,13 @@ const Checkout = () => {
   };
   const toggleOrderSummary1 = () => {
     setShowOrderSummary1(!showOrderSummary1);
+  };
+  const toggleAccount = () => {
+    setShowAccount(!showAccount);
+  };
+  const logoutAccount = async () => {
+    await AsyncStorage.removeItem('userDetail');
+    setUserDetails(null)
   };
   const calculateEstimatedTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.count, 0);
@@ -214,7 +229,27 @@ const Checkout = () => {
             <Text style={styles.orText}>OR</Text>
             <View style={styles.orBorder} />
           </View>
-          <View style={styles.cardContact}>
+          {userDetails ? (<><View>
+            <TouchableOpacity style={styles.account} onPress={toggleAccount}>
+              <View>
+                <Text style={styles.orderSummary}>
+                  Account
+                </Text>
+              </View>
+              <FontAwesome6 name={showAccount ? 'chevron-up' : 'chevron-down'} color="#abaf51" size={12} />
+            </TouchableOpacity>
+            <View style={styles.userDetails}>
+              <Text style={styles.userEmail}>{userDetails.email}</Text>
+            </View>
+            {showAccount && (
+              <View>
+                <TouchableOpacity onPress={logoutAccount}>
+                  <Text style={styles.userLogout}>Log out</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View></>) :
+          (<><View style={styles.cardContact}>
             <Text style={styles.contactText}>Contact</Text>
             <Text style={styles.loginText}>Have an account?
               <TouchableOpacity onPress={()=>navigation.navigate('login')}>
@@ -239,6 +274,8 @@ const Checkout = () => {
             {emailError ? (
               <Text style={styles.errorOuterText}>{emailError}</Text>
             ) : null}
+          </View></>)}
+          <View>
             <CheckBox
               checked={check1}
               onPress={() => setCheck1(!check1)}
@@ -361,7 +398,7 @@ const Checkout = () => {
           <View style={styles.billingDetails}>
             <View style={styles.countryBox}>
               <Picker
-                style={{ height: 50, width: 380 }}
+                style={{ height: 50, width: 380, color: '#000' }}
                 selectedValue={selectedValue}
                 onValueChange={(itemValue, itemIndex) => {
                   setSelectedValue(itemValue);
@@ -392,24 +429,9 @@ const Checkout = () => {
               }}
             />
             {lastNameError ? (
-              <Text style={styles.errorOuterText}>{lastNameError}</Text>
+              <Text style={styles.errorOuterBillText}>{lastNameError}</Text>
             ) : null}
-            <TextInput
-              style={[
-                styles.inputFieldBill,
-                { borderColor: addressError ? 'red' : '#ddd' }
-              ]}
-              placeholder="Address"
-              placeholderTextColor="#000"
-              value={address}
-              onChangeText={(text) => {
-                setAddress(text);
-                setAddressError('');
-              }}
-            />
-            {addressError ? (
-              <Text style={styles.errorOuterText}>{addressError}</Text>
-            ) : null}
+            <Autocomplete selectedCountry={selectedValue}/>
             <TextInput
               style={[
                 styles.inputFieldBill,
@@ -424,12 +446,12 @@ const Checkout = () => {
               }}
             />
             {cityError ? (
-              <Text style={styles.errorOuterText}>{cityError}</Text>
+              <Text style={styles.errorOuterBillText}>{cityError}</Text>
             ) : null}
             {statesShow ? (
               <View style={styles.countryBox}>
                 <Picker
-                  style={{ height: 50, width: 380 }}
+                  style={{ height: 50, width: 380, color: '#000'}}
                   selectedValue={selectedStateValue}
                   onValueChange={(itemValue, itemIndex) => setSelectedStateValue(itemValue)}
                 >
@@ -453,7 +475,7 @@ const Checkout = () => {
               }}
             />
             {zipcodeError ? (
-              <Text style={styles.errorOuterText}>{zipcodeError}</Text>
+              <Text style={styles.errorOuterBillText}>{zipcodeError}</Text>
             ) : null}
           </View>
         </View>
@@ -794,7 +816,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 14,
-    marginLeft: 8,
+    marginLeft: 15,
     alignSelf: 'flex-start'
   },
   errorOuterText: {
@@ -802,7 +824,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 15,
     alignSelf: 'flex-start'
-  }
+  },
+  errorOuterBillText: {
+    color: 'red',
+    fontSize: 14,
+    width: 380
+  },
+  account: {
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  userDetails: {
+    flex: 1,
+    textAlign: 'center'
+  },
+  userEmail: {
+    paddingLeft: 15,
+    fontSize: 20,
+    color: '#000'
+  },
+  userLogout: {
+    paddingLeft: 15,
+    paddingTop: 5,
+    fontSize: 16,
+    color: '#abaf51',
+    textDecorationLine: 'underline'
+  },
 });
 
 export default Checkout;

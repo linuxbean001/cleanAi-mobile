@@ -1,34 +1,40 @@
 import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
-import React, {useState} from 'react';
-
+import React, { useState, useEffect } from 'react';
 import Logo from '../assets/images/logo.png';
-
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Menu from './Menu';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Header = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const navigation = useNavigation();
- 
+  const [userDetails, setUserDetails] = useState(null);
+  useEffect(() => {
+    loadUserData();
+  }, []);
+  const loadUserData = async () => {
+    try {
+      const userDetail = await AsyncStorage.getItem('userDetail');
+      if (userDetail) {
+        const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+        setUserDetails(parsedUser);
+      }
+    } catch (error) {
+      console.error('Error loading cart count:', error);
+    }
+  };
   return (
     <View style={styles.header}>
-      <Menu menuVisible={menuVisible} setMenuVisible={setMenuVisible}/>
+      <Menu menuVisible={menuVisible} setMenuVisible={setMenuVisible} userDetails={userDetails}/>
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           style={styles.sidebarIcon}
           onPress={()=>setMenuVisible(true)}>
           <FeatherIcon name="menu" size={20} color={'#FFFFFF'} />
         </TouchableOpacity>
-
         <Image source={Logo} style={styles.logo} />
-        {/* <View style={styles.searchIcon}>
-        <FeatherIcon name="search" size={20} color={'#FFFFFF'} />
-      </View>
-      <View style={styles.searchIcon}>
-        <FeatherIcon name="shopping-bag" size={20} color={'#FFFFFF'} />
-      </View> */}
       </View>
     </View>
   );
