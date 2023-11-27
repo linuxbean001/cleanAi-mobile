@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import SplashScreen from './src/components/SplashScreen';
 import Songs from './src/components/Songs';
 import Login from './src/components/auth/Login';
 import Register from './src/components/auth/Register';
@@ -27,6 +28,7 @@ function App() {
   return (   
    <NavigationContainer>
      <Stack.Navigator screenOptions={{headerShown: false}}>
+       <Stack.Screen name="splashscreen" component={SplashScreen} />
        <Stack.Screen name="songs" component={Songs} />
        <Stack.Screen name="plans" component={Plans} />
        <Stack.Screen name="addtocart" component={AddToCart} />

@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Image,
-  ScrollView,
-} from 'react-native';
-
-import {useNavigation} from '@react-navigation/native';
+import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Music from '../assets/images/music.png';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -23,8 +15,10 @@ const Songs = () => {
   const [productData, setProductData] = useState([]);
   const [productTags, setProductTags] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
-  const [filterVisible,setFilterVisible]=useState(false)
+  const [filterVisible, setFilterVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const endpoint = `/admin/api/${config.apiVersion}/products.json`;
     axios
@@ -36,15 +30,15 @@ const Songs = () => {
       .then(async (response) => {
         if (response.data.products) {
           const products = response.data.products;
-          const tags = []
-          const types = []
+          const tags = [];
+          const types = [];
           const productsWithMetafields = await Promise.all(
             products.map(async (product) => {
               if (product.tags !== "") {
-                tags.push(product.tags)
+                tags.push(product.tags);
               }
               if (product.product_type !== "") {
-                types.push(product.product_type)
+                types.push(product.product_type);
               }
               const metafieldsEndpoint = `/admin/api/${config.apiVersion}/products/${product.id}/metafields.json`;
               const metafieldsResponse = await axios.get(
@@ -65,24 +59,37 @@ const Songs = () => {
           const uniqueTypes = types.filter((value, index, self) => {
             return self.indexOf(value) === index;
           });
-          setProductTags(uniqueArray)
-          setProductTypes(uniqueTypes)
+          setProductTags(uniqueArray);
+          setProductTypes(uniqueTypes);
           setProductData(productsWithMetafields);
           setFilteredData(productsWithMetafields);
+          setIsLoading(false);
         }
       })
       .catch((error) => {
         console.error('Error fetching products:', error);
+        setIsLoading(false);
       });
   }, []);
+
   const applyFilter = (selectedTags, selectedTypes) => {
     const filteredProducts = productData.filter((product) => {
-      const hasSelectedTag = selectedTags.length === 0 || selectedTags.some((tag) => product.tags.includes(tag));
+      const hasSelectedTag =
+        selectedTags.length === 0 || selectedTags.some((tag) => product.tags.includes(tag));
       const hasSelectedType = selectedTypes.length === 0 || selectedTypes.includes(product.product_type);
       return hasSelectedTag && hasSelectedType;
     });
     setFilteredData(filteredProducts);
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView>
       <View>
@@ -142,6 +149,11 @@ const Songs = () => {
 export default Songs;
 
 const styles = StyleSheet.create({
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   facetsContainer: {
     height: 40,
   },

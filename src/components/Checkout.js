@@ -19,6 +19,7 @@ const Checkout = () => {
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showOrderSummary1, setShowOrderSummary1] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+  const [showApartment, setShowApartment] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [check1, setCheck1] = useState(false);
   const [selectedOption, setSelectedOption] = useState('creditCard');
@@ -113,6 +114,9 @@ const Checkout = () => {
   };
   const toggleAccount = () => {
     setShowAccount(!showAccount);
+  };
+  const showApartments = () => {
+    setShowApartment(true);
   };
   const logoutAccount = async () => {
     await AsyncStorage.removeItem('userDetail');
@@ -434,6 +438,24 @@ const Checkout = () => {
               <Text style={styles.errorOuterBillText}>{lastNameError}</Text>
             ) : null}
             <Autocomplete selectedCountry={selectedValue}/>
+            {!showApartment ? (<><View style={styles.apartment}>
+              <TouchableOpacity onPress={showApartments}>
+                <FontAwesome6 name='plus' color="#abaf51" size={12} />
+                <View style={styles.apartText}>
+                  <Text style={styles.apartSummary}>
+                    Add apartment, suite, etc.
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View></>) : (
+              <TextInput
+                style={[
+                  styles.inputFieldBill
+                ]}
+                placeholder="Apartment, suite, etc. (optional)"
+                placeholderTextColor="#000"
+              />
+            )}
             <TextInput
               style={[
                 styles.inputFieldBill,
@@ -854,6 +876,23 @@ const styles = StyleSheet.create({
     color: '#abaf51',
     textDecorationLine: 'underline'
   },
+  apartment: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignSelf: 'flex-start',
+    padding: 15
+  },
+  apartText: {
+    position: 'absolute',
+    width: 300,
+    left: 14,
+    top: -6
+  },
+  apartSummary: {
+    fontSize: 16,
+    color: '#abaf51'
+  }
 });
 
 export default Checkout;
