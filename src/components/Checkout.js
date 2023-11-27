@@ -137,14 +137,25 @@ const Checkout = () => {
       }
     }
     if (selectedOption === 'creditCard') {
-      if (!cardNumber.trim()) {
-        errors.cardNumber = 'Enter a card number';
+      if (!/^\d{16}$/.test(cardNumber)) {
+        errors.cardNumber = 'Enter a valid 16-digit credit card number';
       }
-      if (!expirationDate.trim()) {
-        errors.expirationDate = 'Enter a valid expiration date';
+      const currentYear = new Date().getFullYear() % 100;
+      const currentMonth = new Date().getMonth() + 1;
+      const [inputMonth, inputYear] = expirationDate.split('/').map((value) => parseInt(value, 10));
+      if (
+        !/^\d{2}\/\d{2}$/.test(expirationDate) ||
+        isNaN(inputMonth) ||
+        isNaN(inputYear) ||
+        inputMonth < 1 ||
+        inputMonth > 12 ||
+        inputYear < currentYear ||
+        (inputYear === currentYear && inputMonth < currentMonth)
+      ) {
+        errors.expirationDate = 'Enter a valid expiration date (MM/YY)';
       }
-      if (!securityCode.trim()) {
-        errors.securityCode = 'Enter the CVV or security code on your card';
+      if (!/^\d{3,4}$/.test(securityCode)) {
+        errors.securityCode = 'Enter a valid 3 or 4-digit security code';
       }
       if (!cardHolderName.trim()) {
         errors.cardHolderName = 'Enter your name exactly as it’s written on your card';
@@ -337,6 +348,9 @@ const Checkout = () => {
                   placeholderTextColor="#000"
                   value={expirationDate}
                   onChangeText={(text) => {
+                    if (text.length === 2 && expirationDate.length === 1 && text > expirationDate) {
+                      text += '/';
+                    }
                     setExpirationDate(text);
                     setExpirationDateError('');
                   }}
@@ -881,7 +895,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignSelf: 'flex-start',
-    padding: 15
+    padding: 15,
+    marginLeft: 5
   },
   apartText: {
     position: 'absolute',
