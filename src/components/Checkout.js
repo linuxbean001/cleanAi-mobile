@@ -7,6 +7,8 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Dummy from '../assets/images/dummy.png';
 import PaypalImage from '../assets/images/paypalButton.png';
 import PayWithImage from '../assets/images/paywithpaypal.png';
+import CreditCard from '../assets/images/creditcard.png';
+import PaypalCheck from '../assets/images/paypalcheck1.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckBox } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
@@ -308,7 +310,12 @@ const Checkout = () => {
           </View>
           <View>
             <CheckBox
-              title="Credit Card"
+              title={
+                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 14, left: 5, fontWeight: '500', color: '#000' }}>Credit Card</Text>
+                  <Image source={CreditCard} style={{ right: 30 }}/>
+                </View>
+              }
               checked={selectedOption === 'creditCard'}
               onPress={() => setSelectedOption('creditCard')}
               checkedIcon="dot-circle-o"
@@ -393,7 +400,12 @@ const Checkout = () => {
               </View>
             )}
             <CheckBox
-              title="PayPal"
+              title={
+                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 14, left: 5, fontWeight: '500', color: '#000' }}>PayPal</Text>
+                  <Image source={PaypalCheck} style={{ width: 100, height: 25, right: 25 }}/>
+                </View>
+              }
               checked={selectedOption === 'paypal'}
               onPress={() => setSelectedOption('paypal')}
               checkedIcon="dot-circle-o"
