@@ -32,24 +32,31 @@ const AddToCart = ({route, navigation}) => {
 
   const saveCartItem = async (price, plan) => {
     try {
-      const cartItems = await AsyncStorage.getItem('cartItems');
       let items = [];
+      const cartItems = await AsyncStorage.getItem('cartItems');
       if (cartItems) {
         items = JSON.parse(cartItems);
-      }
-      const existingItemIndex = items.findIndex((item) => item.plan === plan);
-      if (existingItemIndex !== -1) {
-        items[existingItemIndex].count += 1;
+        const existingItemIndex = items.findIndex((item) => item.plan === plan);
+        if (existingItemIndex !== -1) {
+          items[existingItemIndex] = { price, plan, count: 1 };
+        } else {
+          const otherPlanIndex = items.findIndex((item) => item.plan !== plan);
+          if (otherPlanIndex !== -1) {
+            items[otherPlanIndex] = { price, plan, count: 1 };
+          } else {
+            items.push({ price, plan, count: 1 });
+          }
+        }
       } else {
         items.push({ price, plan, count: 1 });
       }
-
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
-      setCartCount((prevCount) => prevCount + 1);
+      setCartCount(1);
     } catch (error) {
       console.error('Error saving cart item:', error);
     }
   };
+
 
   const toggleModal = async () => {
     if (isModalVisible) {

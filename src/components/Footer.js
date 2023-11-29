@@ -7,14 +7,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Footer = () => {
   const navigation = useNavigation();
-  const goToAccount = async () => {
-    const userDetail = await AsyncStorage.getItem('userDetail');
-    if (userDetail) {
-      navigation.navigate('dashboard')
-    } else {
-      navigation.navigate('login')
+  const [userDetails, setUserDetails] = useState(null);
+  useEffect(() => {
+    loadUserData();
+  }, []);
+  const loadUserData = async () => {
+    try {
+      const userDetail = await AsyncStorage.getItem('userDetail');
+      if (userDetail) {
+        const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+        setUserDetails(parsedUser);
+      }
+    } catch (error) {
+      console.error('Error loading cart count:', error);
     }
-  }
+  };
   return (
     <View style={styles.footer}>
       <Image source={Logo} style={styles.logo} />
@@ -36,9 +43,16 @@ const Footer = () => {
           <Text style={styles.quickContainerText}>Quick links</Text>
         </View>
         <View style={styles.footerListMenu}>
-          <TouchableOpacity onPress={()=> goToAccount()}>
+          {userDetails ? (<TouchableOpacity onPress={()=> navigation.navigate('dashboard')}>
             <Text style={styles.footerListText}> My Account</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>) : (
+            <><TouchableOpacity onPress={()=> navigation.navigate('login')}>
+              <Text style={styles.footerListText}> Login</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=> navigation.navigate('register')}>
+              <Text style={styles.footerListText}> Register</Text>
+            </TouchableOpacity></>
+          )}
           <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
             <Text style={styles.footerListText}> Songs</Text>
           </TouchableOpacity>

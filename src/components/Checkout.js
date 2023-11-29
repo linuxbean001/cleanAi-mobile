@@ -233,21 +233,6 @@ const Checkout = () => {
           </View>
         )}
         <View style={styles.cardExpTop}>
-          <View style={styles.cardExpress}>
-            <Text style={styles.yourCartText}>Express checkout</Text>
-          </View>
-          <View style={styles.cardEmptyBtn}>
-            <TouchableOpacity
-              onPress={()=>navigation.navigate('paypal', { paypalPrice: calculateEstimatedTotal() })}
-            >
-              <Image style={styles.selectPaypalBtn} source={PaypalImage} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.orContainer}>
-            <View style={styles.orBorder} />
-            <Text style={styles.orText}>OR</Text>
-            <View style={styles.orBorder} />
-          </View>
           {userDetails ? (<><View>
             <TouchableOpacity style={styles.account} onPress={toggleAccount}>
               <View>
@@ -397,30 +382,6 @@ const Checkout = () => {
                 {cardHolderNameError ? (
                   <Text style={styles.errorText}>{cardHolderNameError}</Text>
                 ) : null}
-              </View>
-            )}
-            <CheckBox
-              title={
-                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 14, left: 5, fontWeight: '500', color: '#000' }}>PayPal</Text>
-                  <Image source={PaypalCheck} style={{ width: 100, height: 25, right: 25 }}/>
-                </View>
-              }
-              checked={selectedOption === 'paypal'}
-              onPress={() => setSelectedOption('paypal')}
-              checkedIcon="dot-circle-o"
-              uncheckedIcon="circle-o"
-              checkedColor="#abaf51"
-              uncheckedColor="#e5e5e5"
-              containerStyle={{
-                backgroundColor: selectedOption === 'paypal' ? '#f7f8e5' : 'white',
-                borderColor: selectedOption === 'paypal' ? '#abaf51' : '#e5e5e5',
-                borderWidth: 2
-              }}
-            />
-            {selectedOption === 'paypal' && (
-              <View style={styles.additionalDetails}>
-                <Text style={styles.additionalDetailsText}>After clicking "Pay with PayPal", you will be redirected to PayPal to complete your purchase securely.</Text>
               </View>
             )}
           </View>

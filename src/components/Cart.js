@@ -35,12 +35,22 @@ const Cart = ({ title, description, price }) => {
   };
 
   const handleIncrement = (index) => {
+    const item = cartItems[index];
+    if (isBasicOrPremium(item.plan)) {
+      showAlert("Cannot increment for plan quantity");
+      return;
+    }
     const updatedCartItems = [...cartItems];
     updatedCartItems[index].count += 1;
     saveCartItems(updatedCartItems);
   };
 
   const handleDecrement = (index) => {
+    const item = cartItems[index];
+    if (isBasicOrPremium(item.plan)) {
+      showAlert("Cannot decrement for plan quantity");
+      return;
+    }
     const updatedCartItems = [...cartItems];
     if (updatedCartItems[index].count > 1) {
       updatedCartItems[index].count -= 1;
@@ -49,6 +59,11 @@ const Cart = ({ title, description, price }) => {
   };
 
   const handleCountChange = (index, newCount) => {
+    const item = cartItems[index];
+    if (isBasicOrPremium(item.plan)) {
+      showAlert("Cannot change for plan quantity");
+      return;
+    }
     const updatedCartItems = [...cartItems];
     updatedCartItems[index].count = newCount;
     saveCartItems(updatedCartItems);
@@ -62,6 +77,14 @@ const Cart = ({ title, description, price }) => {
   
   const calculateEstimatedTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.count, 0);
+  };
+
+  const isBasicOrPremium = (plan) => {
+    return ['basic', 'premium', 'platinum'].includes(plan.toLowerCase());
+  };
+
+  const showAlert = (message) => {
+    alert(message);
   };
   return (
     <>
@@ -120,11 +143,6 @@ const Cart = ({ title, description, price }) => {
               onPress={()=>navigation.navigate('checkout')}
               style={styles.selectPayBtn}>
               <Text style={styles.selectPayText}>Check out</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={()=>navigation.navigate('paypal', { paypalPrice: calculateEstimatedTotal() })}
-            >
-              <Image style={styles.selectPaypalBtn} source={PaypalImage} />
             </TouchableOpacity>
           </View></>) : (<><CartEmpty/></>)}
         <Footer/>

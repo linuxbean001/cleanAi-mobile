@@ -111,6 +111,15 @@ const Login = () => {
           firstName
           lastName
           email
+          defaultAddress {
+            id
+            address1
+            address2
+            city
+            country
+            province
+            zip
+          }
         }
       }
     `;
@@ -128,7 +137,7 @@ const Login = () => {
       .then(async(response) => {
         const customerDetails = response.data.customer;
         await AsyncStorage.setItem('userDetail', JSON.stringify(customerDetails));
-        navigation.navigate('dashboard');
+        navigation.navigate('songs');
       })
       .catch((error) => {
         console.error(error);
