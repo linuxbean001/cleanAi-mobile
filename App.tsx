@@ -17,6 +17,7 @@ import AddToCart from './src/components/AddToCart';
 import Cart from './src/components/Cart';
 import Paypal from './src/components/Paypal';
 import Checkout from './src/components/Checkout';
+import AudioPlayerPre from './src/components/AudioPlayerPre';
 import Toast from 'react-native-toast-message';
 import TrackPlayer from 'react-native-track-player';
 const Stack = createNativeStackNavigator();
@@ -30,6 +31,7 @@ function App() {
      <Stack.Navigator screenOptions={{headerShown: false}}>
        <Stack.Screen name="splashscreen" component={SplashScreen} />
        <Stack.Screen name="songs" component={Songs} />
+       <Stack.Screen name="audio" component={AudioPlayerPre} />
        <Stack.Screen name="plans" component={Plans} />
        <Stack.Screen name="addtocart" component={AddToCart} />
        <Stack.Screen name="cart" component={Cart} />

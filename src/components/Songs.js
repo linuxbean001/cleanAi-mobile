@@ -128,7 +128,9 @@ const Songs = () => {
                   <Text style={styles.heading}>{card.title}</Text>
                   <Text style={styles.priceItem}>{Number(card.variants[0].price).toFixed(0)} credit</Text>
                   <View style={styles.audioContain}>
-                    <AudioPlayer metafields={card.metafields} trackId={index} />
+                    <TouchableOpacity onPress={()=>navigation.navigate('audio', { card: card, trackImg: card.image, metafields: card.metafields, trackId: index })} style={styles.playButton}>
+                      <Text style={styles.playButtonText}>Preview</Text>
+                    </TouchableOpacity>
                   </View>
                   <TouchableOpacity onPress={()=>navigation.navigate('plans')} style={styles.creditButton}>
                     <Text style={styles.creditButtonText}>Buy Credits</Text>
@@ -136,7 +138,7 @@ const Songs = () => {
                 </View>
               );
             } else {
-              return null; // Or handle the case where metafields[0].value is falsy
+              return null;
             }
           })}
         </View>
@@ -227,5 +229,18 @@ const styles = StyleSheet.create({
   },
   audioContain: {
     flex: 2
+  },
+  playButton: {
+    flexDirection: 'row',
+    marginTop: 105,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#c9d3d8',
+    height: 50,
+    borderRadius: 50,
+  },
+  playButtonText: {
+    textAlign: 'center',
+    color: '#000'
   }
 });
