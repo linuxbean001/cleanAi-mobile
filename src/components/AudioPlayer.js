@@ -12,7 +12,7 @@ const AudioPlayer = ({metafields, trackId}) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
   const [trackUrl, setTrackUrl] = useState('');
-  const apiEndpoint = `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/graphql.json`;
+  const apiEndpoint = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/graphql.json`;
   const client = new ApolloClient({
     link: new HttpLink({
       uri: apiEndpoint,
