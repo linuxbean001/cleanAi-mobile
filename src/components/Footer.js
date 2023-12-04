@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React, { useState, useEffect } from 'react';
 import {useNavigation} from '@react-navigation/native';
-import Logo from '../assets/images/logo.png';
+import Logo from '../assets/images/PNG/H_Sound_Trans_Gold_Logo.png';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -10,7 +10,7 @@ const Footer = () => {
   const [userDetails, setUserDetails] = useState(null);
   useEffect(() => {
     loadUserData();
-  }, []);
+  }, [userDetails]);
   const loadUserData = async () => {
     try {
       const userDetail = await AsyncStorage.getItem('userDetail');
@@ -95,10 +95,10 @@ const styles = StyleSheet.create({
     height: 580,
   },
   logo: {
-    width: 170,
+    width: 130,
     height: 50,
     top: 20,
-    left: 110,
+    left: 135,
   },
   footerHeading: {
     height: 20,

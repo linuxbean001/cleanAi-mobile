@@ -8,6 +8,7 @@ import Paypal from './Paypal';
 import Delete from '../assets/images/delete.jpg';
 import PaypalImage from '../assets/images/paypalButton.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LimitedTextView from './LimitedTextView';
 
 const Cart = ({ title, description, price }) => {
   const navigation = useNavigation();
@@ -104,7 +105,9 @@ const Cart = ({ title, description, price }) => {
           {cartItems.map((item, index) => (
             <View key={index} style={styles.cardForth}>
               <View>
-                <Text style={styles.productName}>{item.plan}</Text>
+                <Text style={styles.productName}>
+                  <LimitedTextView text={item.plan} maxLength={20} />
+                </Text>
                 <Text style={styles.productCrd}>{item.price} Credit</Text>
                 <TouchableOpacity onPress={() => handleDelete(index)} style={styles.buttonDelete}>
                   <Image style={styles.deleteImage} source={Delete} />

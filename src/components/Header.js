@@ -1,6 +1,6 @@
 import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
 import React, { useState, useEffect } from 'react';
-import Logo from '../assets/images/logo.png';
+import Logo from '../assets/images/PNG/H_Sound_Trans_Gold_Logo.png';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Menu from './Menu';
@@ -13,7 +13,7 @@ const Header = () => {
   const [userDetails, setUserDetails] = useState(null);
   useEffect(() => {
     loadUserData();
-  }, []);
+  }, [userDetails]);
   const loadUserData = async () => {
     try {
       const userDetail = await AsyncStorage.getItem('userDetail');
@@ -55,15 +55,9 @@ const styles = StyleSheet.create({
     left: 25,
   },
   logo: {
-    width: 170,
+    width: 130,
     height: 50,
     top: 10,
-    left: 60,
-  },
-  // searchIcon: {
-  //   width: 40,
-  //   height: 40,
-  //   top: 30,
-  //   left: 100,
-  // },
+    left: 90,
+  }
 });

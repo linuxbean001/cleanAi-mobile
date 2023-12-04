@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FlatList, View, Image, TouchableOpacity, StyleSheet, Text, Dimensions } from 'react-native';
+import { FlatList, View, Image, TouchableOpacity, StyleSheet, Text, Dimensions, ActivityIndicator } from 'react-native';
 import TrackPlayer, { useProgress } from 'react-native-track-player';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Slider from '@react-native-community/slider';
@@ -20,8 +20,33 @@ const AudioPlayerPre = ({ route }) => {
   const [selectedTrack, setSelectedTrack] = useState(card);
   const [visibleIndex, setVisibleIndex] = useState(0);
   const flatListRef = useRef(null);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [isInitialScroll, setIsInitialScroll] = useState(true);
+  const [itemLayouts, setItemLayouts] = useState({});
+
+  const onFlatListLayout = () => {
+    if (isInitialScroll && flatListRef.current) {
+      flatListRef.current.scrollToIndex({ index: trackId });
+      setIsInitialScroll(false);
+    }
+  };
+
+  const handleItemLayout = (index, item) => {
+    setItemLayouts((prevLayouts) => ({
+      ...prevLayouts,
+      [index]: item.layout,
+    }));
+  };
 
   useEffect(() => {
+    if (!isInitialScroll && flatListRef.current) {
+      flatListRef.current.scrollToIndex({ index: trackId });
+    }
+  }, [isInitialScroll, trackId]);
+
+  useEffect(() => {
+    setIsLoadingData(true);
     const endpoint = `/admin/api/${config.apiVersion}/products.json`;
     axios
       .get(`${config.shopifyStoreUrl}${endpoint}`, {
@@ -47,10 +72,18 @@ const AudioPlayerPre = ({ route }) => {
               return product;
             })
           );
-          setAllProductsWithMetafields(productsWithMetafields);
+          const filteredProducts = productsWithMetafields.filter((product) => {
+            return (
+              product.metafields.length > 0 &&
+              product.metafields[0].value
+            );
+          });
+          setAllProductsWithMetafields(filteredProducts);
+          setIsLoadingData(false);
         }
       })
       .catch((error) => {
+        setIsLoadingData(false);
         console.error('Error fetching products:', error);
       });
   }, []);
@@ -173,32 +206,37 @@ const AudioPlayerPre = ({ route }) => {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <FontAwesome6 name="arrow-left" color="#000" size={20} style={styles.icon} />
       </TouchableOpacity>
-      <FlatList
-        ref={flatListRef}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        pagingEnabled
-        data={allProductsWithMetafields}
-        keyExtractor={(item) => item.id.toString()}
-        initialScrollIndex={
-          allProductsWithMetafields.length > 0
-            ? allProductsWithMetafields.findIndex((product) => product.id === selectedTrack.id)
-            : 0
-        }
-        onScroll={onScroll}
-        renderItem={({ item }) => (
-          <View style={styles.bannerView}>
-            <TouchableOpacity onPress={() => handleTrackPress(item)}>
-              {item.image && item.image.src ? (
-                <Image style={styles.artwork} source={{ uri: item.image.src }} />
-              ) : (
-                <Image style={styles.artwork} source={Music} />
-              )}
-            </TouchableOpacity>
-            <Text style={styles.title}>{item.title}</Text>
-          </View>
-        )}
-      />
+      {isLoadingData ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          data={allProductsWithMetafields}
+          keyExtractor={(item) => item.id.toString()}
+          onLayout={() => onFlatListLayout()}
+          onScroll={onScroll}
+          renderItem={({ item, index }) => (
+            <View style={styles.bannerView} onLayout={(event) => handleItemLayout(index, event)}>
+              <TouchableOpacity onPress={() => handleTrackPress(item)}>
+                <Image
+                  style={styles.artwork}
+                  source={
+                    item.image && item.image.src
+                      ? { uri: item.image.src }
+                      : Music
+                  }
+                />
+              </TouchableOpacity>
+              <Text style={styles.title}>{item.title}</Text>
+            </View>
+          )}
+        />
+      )}
       <Slider
         style={styles.slider}
         minimumValue={0}
@@ -207,8 +245,8 @@ const AudioPlayerPre = ({ route }) => {
         onValueChange={(value) => TrackPlayer.seekTo(value)}
       />
       <View style={styles.timeContainer}>
-        <Text>{formatTime(position)}</Text>
-        <Text>{formatTime(duration)}</Text>
+        <Text style={styles.timeContainerText}>{formatTime(position)}</Text>
+        <Text style={styles.timeContainerText}>{formatTime(duration)}</Text>
       </View>
       <View style={styles.controls}>
         <TouchableOpacity onPress={skipToPrevious}>
@@ -251,13 +289,16 @@ const styles = StyleSheet.create({
   },
   slider: {
     width: '90%',
-    height: 40
+    height: 40,
+    backgroundColor: '#ddd'
   },
   timeContainer: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '90%',
+    width: '90%'
+  },
+  timeContainerText: {
     color: '#000'
   },
   controls: {
@@ -276,6 +317,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#000'
+  },
+  loader: {
+    height: 400,
+    marginTop: 100,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   }
 });
 

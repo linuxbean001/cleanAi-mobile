@@ -19,33 +19,13 @@ const Dashboard = () => {
   const navigation = useNavigation();
   const [orderData, setOrderData] = useState([]);
   const [userDetails, setUserDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState('');
+  const [loading, setLoading] = useState(false);
   const logoutAccount = async () => {
     await AsyncStorage.removeItem('userDetail');
     navigation.navigate('login');
   };
 
-  useEffect(() => {
-    const endpoint = `/admin/api/${config.apiVersion}/customers/7413304394030/orders.json?status=any`;
-    axios
-      .get(`${config.shopifyStoreUrl}${endpoint}`, {
-        headers: {
-          'X-Shopify-Access-Token': config.shopifyApiKey,
-        },
-      })
-      .then(async (response) => {
-        if (response.data.orders) {
-          const orders = response.data.orders;
-          setOrderData(orders);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching orders:', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
   useEffect(() => {
     loadUserData();
   }, []);
@@ -53,13 +33,46 @@ const Dashboard = () => {
     try {
       const userDetail = await AsyncStorage.getItem('userDetail');
       if (userDetail) {
-        const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+        const parsedUser = JSON.parse(userDetail);
         setUserDetails(parsedUser);
+        if (parsedUser && parsedUser.id) {
+          const gid = parsedUser.id;
+          const parts = gid.split('/');
+          const id = parts[parts.length - 1];
+          setUserId(id);
+        }
       }
     } catch (error) {
-      console.error('Error loading cart count:', error);
+      console.error('Error loading user details:', error);
     }
   };
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        if (userId) {
+          const endpoint = `/admin/api/${config.apiVersion}/customers/${userId}/orders.json?status=any`;
+          const response = await axios.get(`${config.shopifyStoreUrl}${endpoint}`, {
+            headers: {
+              'X-Shopify-Access-Token': config.shopifyApiKey,
+            },
+          });
+
+          if (response.data.orders) {
+            const orders = response.data.orders;
+            setOrderData(orders);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [userId]);
 
   return (
     <ScrollView style={styles.container}>
@@ -110,9 +123,9 @@ const Dashboard = () => {
           {userDetails && (
             <View style={styles.userDetails}>
               <Text style={styles.userDetailText}>{userDetails.firstName} {userDetails.lastName}</Text>
-              <Text style={styles.userDetailText}>{userDetails.defaultAddress.address1}</Text>
-              <Text style={styles.userDetailText}>{userDetails.defaultAddress.city} {userDetails.defaultAddress.province} {userDetails.defaultAddress.zip}</Text>
-              <Text style={styles.userDetailText}>{userDetails.defaultAddress.country}</Text>
+              <Text style={styles.userDetailText}>{(userDetails && userDetails.defaultAddress && userDetails.defaultAddress.address1) ? userDetails.defaultAddress.address1 : ''}</Text>
+              <Text style={styles.userDetailText}>{(userDetails && userDetails.defaultAddress && userDetails.defaultAddress.city) ? userDetails.defaultAddress.city : ''} {(userDetails && userDetails.defaultAddress && userDetails.defaultAddress.province) ? userDetails.defaultAddress.province : ''} {(userDetails && userDetails.defaultAddress && userDetails.defaultAddress.zip) ? userDetails.defaultAddress.zip : ''}</Text>
+              <Text style={styles.userDetailText}>{(userDetails && userDetails.defaultAddress && userDetails.defaultAddress.country) ? userDetails.defaultAddress.country : ''}</Text>
             </View>
           )}
           <TouchableOpacity>
@@ -198,7 +211,6 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   noDataText: {
-    textAlign: 'center',
     fontSize: 16,
     color: 'gray',
   },

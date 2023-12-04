@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { Animated, StyleSheet, Text, TouchableOpacity, View, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Music from '../assets/images/music.png';
@@ -9,6 +9,7 @@ import Header from './Header';
 import Filter from './Filter';
 import AudioPlayer from './AudioPlayer';
 import config from './../config/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Songs = () => {
   const navigation = useNavigation();
@@ -18,6 +19,54 @@ const Songs = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [balanceData, setBalanceData] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [error, setError] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(-300)).current;
+  const [cartTitle, setCartTitle] = useState('');
+  const [scrollY, setScrollY] = useState(new Animated.Value(0));
+  const scrollViewRef = useRef();
+
+  useEffect(() => {
+    loadUserData();
+    fetchData();
+    loadCartCount();
+  }, [userDetails]);
+
+  const loadUserData = async () => {
+    try {
+      const userDetail = await AsyncStorage.getItem('userDetail');
+      if (userDetail) {
+        const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+        setUserDetails(parsedUser);
+      }
+    } catch (error) {
+      console.error('Error loading cart count:', error);
+    }
+  };
+
+  const fetchData = async () => {
+    const email = (userDetails) ? userDetails.email : '';
+    const apiUrl = `https://app.shopwaive.com/api/customer/${encodeURIComponent(email)}`;
+    try {
+      const response = await axios.get(apiUrl, {
+        headers: {
+          'X-Shopwaive-Access-Token': config.shopwaiveAccessToken,
+          'X-Shopwaive-Platform': config.shopwaivePlatform,
+          'Content-Type': 'application/json'
+        },
+      });
+      const fetchedBalance = response.data;
+      setBalanceData(fetchedBalance);
+      setBalance(fetchedBalance.balance);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   useEffect(() => {
     const endpoint = `/admin/api/${config.apiVersion}/products.json`;
@@ -59,10 +108,16 @@ const Songs = () => {
           const uniqueTypes = types.filter((value, index, self) => {
             return self.indexOf(value) === index;
           });
+          const filteredProducts = productsWithMetafields.filter((product) => {
+            return (
+              product.metafields.length > 0 &&
+              product.metafields[0].value
+            );
+          });
           setProductTags(uniqueArray);
           setProductTypes(uniqueTypes);
-          setProductData(productsWithMetafields);
-          setFilteredData(productsWithMetafields);
+          setProductData(filteredProducts);
+          setFilteredData(filteredProducts);
           setIsLoading(false);
         }
       })
@@ -82,6 +137,95 @@ const Songs = () => {
     setFilteredData(filteredProducts);
   };
 
+  const loadCartCount = async () => {
+    try {
+      const cartItems = await AsyncStorage.getItem('cartItems');
+      if (cartItems) {
+        const items = JSON.parse(cartItems);
+        const totalCartCount = items.reduce((acc, item) => acc + item.count, 0);
+        setCartCount(totalCartCount);
+      } else {
+        setCartCount(0);
+      }
+    } catch (error) {
+      console.error('Error loading cart count:', error);
+    }
+  };
+
+  const addToCart = async (price, plan) => {
+    try {
+      const cartItems = await AsyncStorage.getItem('cartItems');
+      let items = [];
+      if (cartItems) {
+        items = JSON.parse(cartItems);
+      }
+      const existingItemIndex = items.findIndex((item) => item.plan === plan);
+      if (existingItemIndex !== -1) {
+        items[existingItemIndex].count += 1;
+      } else {
+        items.push({ price, plan, count: 1 });
+      }
+      await AsyncStorage.setItem('cartItems', JSON.stringify(items));
+      setCartCount((prevCount) => prevCount + 1);
+    } catch (error) {
+      console.error('Error saving cart item:', error);
+    }
+  };
+
+  const downloadItem = async (price, plan) => {
+    addToCart(price, plan);
+    setCartTitle(plan);
+    await loadCartCount();
+    setModalVisible(true);
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    scrollViewRef.current.scrollTo({ y: 0, animated: true });
+  };
+
+  const toggleModal = async () => {
+    if (isModalVisible) {
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: -300,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setModalVisible(false));
+    }
+  }
+
+  const goCart = async () => {
+    navigation.navigate('cart');
+    await loadCartCount();
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: -300,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setModalVisible(false));
+  }
+
   if (isLoading) {
     return (
       <View style={styles.loaderContainer}>
@@ -91,7 +235,12 @@ const Songs = () => {
   }
 
   return (
-    <ScrollView>
+    <ScrollView ref={scrollViewRef}
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: false }
+      )}
+    >
       <View>
         <Header />
         <View style={styles.facetsContainer}>
@@ -132,9 +281,15 @@ const Songs = () => {
                       <Text style={styles.playButtonText}>Preview</Text>
                     </TouchableOpacity>
                   </View>
-                  <TouchableOpacity onPress={()=>navigation.navigate('plans')} style={styles.creditButton}>
-                    <Text style={styles.creditButtonText}>Buy Credits</Text>
-                  </TouchableOpacity>
+                  {balance > 0 && userDetails ? (
+                    <TouchableOpacity onPress={() => downloadItem(card.variants[0].price, card.title)} style={styles.creditButton}>
+                      <Text style={styles.creditButtonText}>Download</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={() => navigation.navigate('plans')} style={styles.creditButton}>
+                      <Text style={styles.creditButtonText}>Buy Credits</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               );
             } else {
@@ -142,6 +297,47 @@ const Songs = () => {
             }
           })}
         </View>
+        <Animated.View
+          style={[
+            styles.modal,
+            {
+              opacity,
+              transform: [
+                {
+                  translateY: translateY.interpolate({
+                    inputRange: [0, 300],
+                    outputRange: [0, -300],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ],
+              position: 'absolute',
+              alignSelf: 'center',
+              top: 100,
+            },
+          ]}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Item added to your cart</Text>
+            <Text style={styles.modalText}>{cartTitle}</Text>
+            <TouchableOpacity
+              onPress={()=> goCart() }
+              style={styles.viewCart}>
+              <Text style={styles.viewText}>View cart ({cartCount})</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={()=>navigation.navigate('checkout')}
+              style={styles.checkout}>
+              <Text style={styles.checkText}>Check out</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
+              <Text style={styles.closeText}>Continue shopping</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleModal}>
+              <Text style={styles.closeText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
         <Footer />
       </View>
     </ScrollView>
@@ -242,5 +438,54 @@ const styles = StyleSheet.create({
   playButtonText: {
     textAlign: 'center',
     color: '#000'
+  },
+  modal: {
+    position: 'absolute',
+    top: '10%',
+    left: 0,
+    right: 0,
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    backgroundColor: '#121212',
+    borderRadius: 20,
+    padding: 5,
+    alignItems: 'center',
+  },
+  modalContent: {
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+    color: '#fff'
+  },
+  closeText: {
+    fontSize: 16,
+    color: '#fff',
+    marginTop: 10,
+  },
+  viewCart: {
+    width: 300,
+    padding: 15,
+    backgroundColor: '#121212',
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: '#fff'
+  },
+  viewText: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center'
+  },
+  checkout: {
+    marginTop: 10,
+    width: 300,
+    padding: 15,
+    backgroundColor: '#fff',
+    alignSelf: 'center'
+  },
+  checkText: {
+    fontSize: 20,
+    color: '#000',
+    textAlign: 'center'
   }
 });

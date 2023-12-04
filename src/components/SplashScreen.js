@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import Logo from '../assets/images/logo.png';
+import Logo from '../assets/images/PNG/H_Sound_Trans_Gold_Logo.png';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   },
   image: {
     resizeMode: 'cover',
-    width: 170,
+    width: 130,
     height: 50
   },
 });
