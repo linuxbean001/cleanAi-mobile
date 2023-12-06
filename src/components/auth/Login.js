@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation,CommonActions} from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -137,7 +137,12 @@ const Login = () => {
       .then(async(response) => {
         const customerDetails = response.data.customer;
         await AsyncStorage.setItem('userDetail', JSON.stringify(customerDetails));
-        navigation.navigate('songs');
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'songs' }],
+          })
+        );
       })
       .catch((error) => {
         console.error(error);

@@ -1,6 +1,6 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React, { useState, useEffect } from 'react';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import Logo from '../assets/images/PNG/H_Sound_Trans_Gold_Logo.png';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +21,14 @@ const Footer = () => {
     } catch (error) {
       console.error('Error loading cart count:', error);
     }
+  };
+  const goToSongs = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'songs' }],
+      })
+    );
   };
   return (
     <View style={styles.footer}>
@@ -55,7 +63,7 @@ const Footer = () => {
               <Text style={styles.footerListText}> Register</Text>
             </TouchableOpacity></>
           )}
-          <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
+          <TouchableOpacity onPress={()=>goToSongs()}>
             <Text style={styles.footerListText}> Songs</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={()=>navigation.navigate('plans')}>

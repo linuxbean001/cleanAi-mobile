@@ -15,7 +15,7 @@ import Vector from '../assets/images/Vector.png';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MatrrialIcons from 'react-native-vector-icons/MaterialIcons';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 
 const Menu = ({menuVisible, setMenuVisible, userDetails}) => {
   const navigation = useNavigation();
@@ -26,6 +26,14 @@ const Menu = ({menuVisible, setMenuVisible, userDetails}) => {
       navigation.navigate('login')
     }
   }
+  const goToSongs = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'songs' }],
+      })
+    );
+  };
   return (
     <View>
       <Modal
@@ -39,7 +47,7 @@ const Menu = ({menuVisible, setMenuVisible, userDetails}) => {
             style={styles.ModalClose}>
             <AntDesignIcon name="close" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>navigation.navigate('songs')} style={styles.headerDrawer}>
+          <TouchableOpacity onPress={()=>goToSongs()} style={styles.headerDrawer}>
             <View
               style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={styles.facetsSummaryText}>Songs</Text>
