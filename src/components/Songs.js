@@ -253,7 +253,9 @@ const Songs = () => {
           />
           <View style={styles.facets}>
             <TouchableOpacity 
-             onPress={()=>setFilterVisible(true)}
+             onPress={()=> {
+              setFilterVisible(true)
+            }}
             style={styles.filter}>
               <FontAwesome6 name="sliders" color="#000" size={20} />
             <Text style={styles.facetsLabel}>Filter</Text>
@@ -353,17 +355,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   facetsContainer: {
-    height: 40,
+    flex: 1
   },
   facets: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height: 30,
     marginLeft: 20,
     marginRight: 20
   },
   filter: {
-    top: 40,
+    top: 12,
   },
   facetsLabel: {
     left: 35,
@@ -372,7 +373,7 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   productCount: {
-    top: 40,
+    top: 12,
     fontSize: 14,
     color: '#000'
   },
@@ -386,10 +387,11 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 180,
+    marginBottom: 20
   },
   imageContainer: {
     flex: 3,
-    top: 60,
+    top: 20,
     alignSelf: 'center',
     textAlign: 'center'
   },
@@ -400,13 +402,13 @@ const styles = StyleSheet.create({
   },
   heading: {
     flex: 1,
-    top: 80,
+    top: 50,
     fontSize: 12,
     color: '#000'
   },
   priceItem: {
     flex: 1,
-    top: 95,
+    top: 65,
     fontSize: 16,
     color: '#000'
   },
@@ -416,7 +418,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderWidth: 1,
     borderColor: '#000000',
-    top: 15,
+    top: 10,
   },
   creditButtonText: {
     textAlign: 'center',
@@ -428,7 +430,7 @@ const styles = StyleSheet.create({
   },
   playButton: {
     flexDirection: 'row',
-    marginTop: 105,
+    marginTop: 80,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#c9d3d8',

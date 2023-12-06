@@ -24,7 +24,9 @@ const Footer = () => {
   };
   return (
     <View style={styles.footer}>
-      <Image source={Logo} style={styles.logo} />
+      <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+        <Image source={Logo} style={styles.logo} />
+      </View>
       <View style={{left: 40}}>
         <View style={styles.footerHeading}>
           <Text style={styles.footerHeadingText}>nerds unite</Text>
@@ -97,8 +99,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 130,
     height: 50,
-    top: 20,
-    left: 135,
+    top: 20
   },
   footerHeading: {
     height: 20,

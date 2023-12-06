@@ -21,14 +21,6 @@ import { useNavigation } from '@react-navigation/native';
 
 const Balance = ({balanceVisible, setBalanceVisible, balance, activityData, userDetails}) => {
   const navigation = useNavigation();
-  const yourListData = [
-    { id: 1, name: 'Item 1', recentColumn: 'Recent 1', availableColumn: 'Available 1' },
-    { id: 2, name: 'Item 2', recentColumn: 'Recent 2', availableColumn: 'Available 2' },
-    { id: 3, name: 'Item 2', recentColumn: 'Recent 2', availableColumn: 'Available 2' },
-    { id: 4, name: 'Item 2', recentColumn: 'Recent 2', availableColumn: 'Available 2' },
-    { id: 5, name: 'Item 2', recentColumn: 'Recent 2', availableColumn: 'Available 2' },
-    { id: 6, name: 'Item 2', recentColumn: 'Recent 2', availableColumn: 'Available 2' },
-  ];
   return (
     <View>
       <Modal
@@ -37,14 +29,14 @@ const Balance = ({balanceVisible, setBalanceVisible, balance, activityData, user
         animationType="slide"
         onBackdropPress={() => setBalanceVisible(false)}>
         <View style={styles.modalView}>
-          <TouchableOpacity
-            onPress={() => setBalanceVisible(false)}
-            style={styles.ModalClose}>
-            <AntDesignIcon name="minus" size={24} color="#000000" />
-          </TouchableOpacity>
           <View style={styles.headerDrawer}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={styles.facetsSummaryText}>Available Credits</Text>
+              <TouchableOpacity
+                onPress={() => setBalanceVisible(false)}
+                style={styles.ModalClose}>
+                <AntDesignIcon name="minus" size={24} color="#000000" />
+              </TouchableOpacity>
             </View>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text style={styles.balanceSummaryText}>{Number(balance).toFixed(2)}</Text>
@@ -126,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   headerDrawer: {
-    width: 330,
+    width: '100%',
     height: 50,
     gap: 4,
     marginTop: 20,
@@ -157,7 +149,8 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   creditText: {
-    fontSize: 16
+    fontSize: 16,
+    color: '#000'
   },
   inputField: {
     marginTop: 20,
@@ -184,9 +177,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   ModalClose: {
-    top: 20,
-    left: 360,
-    position: 'absolute'
+    right: 20
   },
   listContainer: {
     flex: 1,
@@ -214,17 +205,20 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   column1: {
-    width: 200
+    width: 200,
+    color: '#000'
   },
   column2Container: {
     width: 100,
   },
   transText: {
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#000'
   },
   dateText: {
     textAlign: 'right',
-    right: 5
+    right: 5,
+    color: '#000'
   }
 });

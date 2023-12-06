@@ -8,6 +8,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, gql } from '@apo
 import Music from '../assets/images/music.png';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import Orientation from 'react-native-orientation-locker';
 
 const { height, width } = Dimensions.get('window');
 
@@ -24,6 +25,13 @@ const AudioPlayerPre = ({ route }) => {
   const [imageLoading, setImageLoading] = useState(true);
   const [isInitialScroll, setIsInitialScroll] = useState(true);
   const [itemLayouts, setItemLayouts] = useState({});
+
+  useEffect(() => {
+    Orientation.lockToPortrait();
+    return () => {
+      Orientation.unlockAllOrientations();
+    };
+  }, []);
 
   const onFlatListLayout = () => {
     if (isInitialScroll && flatListRef.current) {
