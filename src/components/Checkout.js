@@ -196,7 +196,7 @@ const Checkout = () => {
     <>
       <ScrollView>
         <View style={styles.cardTop}>
-          <Text style={styles.yourCart}>Clean AI</Text>
+          <Text style={styles.yourCart}>VRenity</Text>
           <TouchableOpacity onPress={()=>navigation.navigate('cart')}>
             <FontAwesome6 style={styles.shoppingBag} name="bag-shopping" color="#abaf51" size={20} />
           </TouchableOpacity>

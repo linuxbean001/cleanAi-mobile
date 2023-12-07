@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View, Image, ScrollView, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import axios from 'axios';
 import Music from '../assets/images/music.png';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -28,6 +28,7 @@ const Songs = () => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-300)).current;
   const [cartTitle, setCartTitle] = useState('');
+  const [selectedCard, setSelectedCard] = useState(null);
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
   const scrollViewRef = useRef();
 
@@ -152,7 +153,7 @@ const Songs = () => {
     }
   };
 
-  const addToCart = async (price, plan) => {
+  const addToCart = async (price, plan, card) => {
     try {
       const cartItems = await AsyncStorage.getItem('cartItems');
       let items = [];
@@ -163,7 +164,7 @@ const Songs = () => {
       if (existingItemIndex !== -1) {
         items[existingItemIndex].count += 1;
       } else {
-        items.push({ price, plan, count: 1 });
+        items.push({ price, plan, card, count: 1 });
       }
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
       setCartCount((prevCount) => prevCount + 1);
@@ -172,9 +173,10 @@ const Songs = () => {
     }
   };
 
-  const downloadItem = async (price, plan) => {
-    addToCart(price, plan);
+  const downloadItem = async (price, plan, card) => {
+    addToCart(price, plan, card);
     setCartTitle(plan);
+    setSelectedCard(card);
     await loadCartCount();
     setModalVisible(true);
     Animated.parallel([
@@ -206,11 +208,17 @@ const Songs = () => {
           useNativeDriver: true,
         }),
       ]).start(() => setModalVisible(false));
+      setSelectedCard(null)
     }
   }
 
   const goCart = async () => {
-    navigation.navigate('cart');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'cart' }],
+      })
+    );
     await loadCartCount();
     Animated.parallel([
       Animated.timing(opacity, {
@@ -250,6 +258,7 @@ const Songs = () => {
             productTags={productTags}
             productTypes={productTypes}
             applyFilter={applyFilter}
+            filteredData={filteredData.length}
           />
           <View style={styles.facets}>
             <TouchableOpacity 
@@ -284,7 +293,7 @@ const Songs = () => {
                     </TouchableOpacity>
                   </View>
                   {balance > 0 && userDetails ? (
-                    <TouchableOpacity onPress={() => downloadItem(card.variants[0].price, card.title)} style={styles.creditButton}>
+                    <TouchableOpacity onPress={() => downloadItem(card.variants[0].price, card.title, card)} style={styles.creditButton}>
                       <Text style={styles.creditButtonText}>Download</Text>
                     </TouchableOpacity>
                   ) : (
@@ -321,7 +330,12 @@ const Songs = () => {
         >
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>Item added to your cart</Text>
-            <Text style={styles.modalText}>{cartTitle}</Text>
+            {selectedCard && (
+              <>
+                <Image style={styles.modalImage} source={{ uri: selectedCard.image.src }} />
+                <Text style={styles.modalText}>{selectedCard.title}</Text>
+              </>
+            )}
             <TouchableOpacity
               onPress={()=> goCart() }
               style={styles.viewCart}>
@@ -489,5 +503,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#000',
     textAlign: 'center'
+  },
+  modalImage: {
+    height: 120,
+    width: 120,
+    borderRadius: 60,
+    marginBottom: 10,
   }
 });

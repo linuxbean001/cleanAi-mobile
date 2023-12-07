@@ -18,7 +18,7 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
-const Filter = ({filterVisible, setFilterVisible, productTags, productTypes, applyFilter}) => {
+const Filter = ({filterVisible, setFilterVisible, productTags, productTypes, applyFilter, filteredData}) => {
   const [checkedItems, setCheckedItems] = useState(Array(productTags.length).fill(false));
   const [checkedTypes, setCheckedTypes] = useState(Array(productTypes.length).fill(false));
   const [isCategoriesOpen, setCategoriesOpen] = useState(true);
@@ -57,7 +57,7 @@ const Filter = ({filterVisible, setFilterVisible, productTags, productTypes, app
         <View style={styles.modalView}>
           <View style={styles.facetsHeader}>
             <Text style={styles.facetsHeading}>Filter</Text>
-            <Text style={styles.facetsCount}>11 products</Text>
+            <Text style={styles.facetsCount}>{filteredData} products</Text>
             <TouchableOpacity
               onPress={() => setFilterVisible(false)}
               style={styles.ModalClose}>

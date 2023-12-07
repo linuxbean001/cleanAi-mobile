@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, Image, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Header from './Header';
 import Footer from './Footer';
@@ -9,21 +9,26 @@ import Delete from '../assets/images/delete.jpg';
 import PaypalImage from '../assets/images/paypalButton.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LimitedTextView from './LimitedTextView';
+import Music from '../assets/images/music.png';
 
 const Cart = ({ title, description, price }) => {
   const navigation = useNavigation();
   const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     loadCartItems();
   }, []);
 
   const loadCartItems = async () => {
     try {
+      setIsLoading(true);
       const storedCartItems = await AsyncStorage.getItem('cartItems');
       const parsedCartItems = storedCartItems ? JSON.parse(storedCartItems) : [];
       setCartItems(parsedCartItems);
     } catch (error) {
       console.error('Error loading cart count:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const saveCartItems = async (updatedCartItems) => {
@@ -91,63 +96,76 @@ const Cart = ({ title, description, price }) => {
     <>
       <ScrollView>
         <Header/>
-          {cartItems.length > 0 ? (<><View style={styles.cardTop}>
-            <Text style={styles.yourCart}>Your cart</Text>
-            <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
-              <Text style={styles.continue}>Continue shopping</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cardTopSecond}>
-            <Text style={styles.productTotal}>Product</Text>
-            <Text style={styles.productTotal}>Total</Text>
-          </View>
-          <View style={styles.cardThird}></View>
-          {cartItems.map((item, index) => (
-            <View key={index} style={styles.cardForth}>
-              <View>
-                <Text style={styles.productName}>
-                  <LimitedTextView text={item.plan} maxLength={20} />
-                </Text>
-                <Text style={styles.productCrd}>{item.price} Credit</Text>
-                <TouchableOpacity onPress={() => handleDelete(index)} style={styles.buttonDelete}>
-                  <Image style={styles.deleteImage} source={Delete} />
-                </TouchableOpacity>
-                <View style={styles.container}>
-                  <TouchableOpacity onPress={() => handleDecrement(index)} style={styles.button}>
-                    <Text style={styles.buttonText}>-</Text>
-                  </TouchableOpacity>
-                  <TextInput
-                    style={styles.input}
-                    value={item.count.toString()}
-                    onChangeText={(newCount) => handleCountChange(index, parseInt(newCount, 10))}
-                    keyboardType="numeric"
-                  />
-                  <TouchableOpacity onPress={() => handleIncrement(index)} style={styles.button}>
-                    <Text style={styles.buttonText}>+</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <Text style={styles.productTotal}>{item.price * item.count} Credit</Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#000" style={styles.loader} />
+          ) : (
+            <>
+            {cartItems.length > 0 ? (<><View style={styles.cardTop}>
+              <Text style={styles.yourCart}>Your cart</Text>
+              <TouchableOpacity onPress={()=>navigation.navigate('songs')}>
+                <Text style={styles.continue}>Continue shopping</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-          <View style={styles.cardFifth}></View>
-          <View style={styles.cardBottom}>
-            <Text style={styles.estimatedTotal}>Estimated total</Text>
-            <Text style={styles.totalCrd}>{calculateEstimatedTotal()} Credit</Text>
-          </View>
-          <View style={styles.cardBottomText}>
-            <Text style={styles.cardBottomText2}>Taxes, discounts and shipping calculated at checkout</Text>
-          </View>
-          <View style={styles.cardBottomText1}>
-            <Text style={styles.bottomText1}>Please apply credits to Download this song (if available into your AC), click on credit button</Text>
-          </View>
-          <View style={styles.cardPayBtn}>
-            <TouchableOpacity
-              onPress={()=>navigation.navigate('checkout')}
-              style={styles.selectPayBtn}>
-              <Text style={styles.selectPayText}>Check out</Text>
-            </TouchableOpacity>
-          </View></>) : (<><CartEmpty/></>)}
+            <View style={styles.cardTopSecond}>
+              <Text style={styles.productTotal}>Product</Text>
+              <Text style={styles.productTotal}>Total</Text>
+            </View>
+            <View style={styles.cardThird}></View>
+            {cartItems.map((item, index) => (
+              <View key={index} style={styles.cardForth}>
+                <View>
+                  {item.card.image && item.card.image.src ? (
+                    <Image style={styles.cardImage} source={{ uri: item.card.image.src }} />
+                  ) : item.card.image === null ? (
+                    <></>
+                  ) : (
+                    <Image style={styles.cardImage} source={Music} />
+                  )}
+                  <Text style={styles.productName}>
+                    <LimitedTextView text={item.plan} maxLength={20} />
+                  </Text>
+                  <Text style={styles.productCrd}>{item.price} Credit</Text>
+                  <TouchableOpacity onPress={() => handleDelete(index)} style={styles.buttonDelete}>
+                    <Image style={styles.deleteImage} source={Delete} />
+                  </TouchableOpacity>
+                  <View style={styles.container}>
+                    <TouchableOpacity onPress={() => handleDecrement(index)} style={styles.button}>
+                      <Text style={styles.buttonText}>-</Text>
+                    </TouchableOpacity>
+                    <TextInput
+                      style={styles.input}
+                      value={item.count.toString()}
+                      onChangeText={(newCount) => handleCountChange(index, parseInt(newCount, 10))}
+                      keyboardType="numeric"
+                    />
+                    <TouchableOpacity onPress={() => handleIncrement(index)} style={styles.button}>
+                      <Text style={styles.buttonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <Text style={styles.productTotal}>{item.price * item.count} Credit</Text>
+              </View>
+            ))}
+            <View style={styles.cardFifth}></View>
+            <View style={styles.cardBottom}>
+              <Text style={styles.estimatedTotal}>Estimated total</Text>
+              <Text style={styles.totalCrd}>{calculateEstimatedTotal()} Credit</Text>
+            </View>
+            <View style={styles.cardBottomText}>
+              <Text style={styles.cardBottomText2}>Taxes, discounts and shipping calculated at checkout</Text>
+            </View>
+            <View style={styles.cardBottomText1}>
+              <Text style={styles.bottomText1}>Please apply credits to Download this song (if available into your AC), click on credit button</Text>
+            </View>
+            <View style={styles.cardPayBtn}>
+              <TouchableOpacity
+                onPress={()=>navigation.navigate('checkout')}
+                style={styles.selectPayBtn}>
+                <Text style={styles.selectPayText}>Check out</Text>
+              </TouchableOpacity>
+            </View></>) : (<><CartEmpty/></>)}
+            </>
+          )}
         <Footer/>
       </ScrollView>
     </> 
@@ -296,6 +314,20 @@ const styles = StyleSheet.create({
     width: 570,
     height: 80,
     alignSelf: 'center'
+  },
+  cardImage: {
+    position: 'absolute',
+    top: 10,
+    height: 50,
+    width: 50,
+    borderRadius: 60,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+    marginBottom: 50
   }
 });
 

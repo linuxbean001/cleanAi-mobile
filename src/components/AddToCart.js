@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from '
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import Footer from './Footer';
+import {useNavigation,CommonActions} from '@react-navigation/native';
 
 const AddToCart = ({route, navigation}) => {
   const { price, plan } = route.params;
@@ -38,17 +39,17 @@ const AddToCart = ({route, navigation}) => {
         items = JSON.parse(cartItems);
         const existingItemIndex = items.findIndex((item) => item.plan === plan);
         if (existingItemIndex !== -1) {
-          items[existingItemIndex] = { price, plan, count: 1 };
+          items[existingItemIndex] = { price, plan, card: { image: null }, count: 1 };
         } else {
           const otherPlanIndex = items.findIndex((item) => item.plan !== plan);
           if (otherPlanIndex !== -1) {
-            items[otherPlanIndex] = { price, plan, count: 1 };
+            items[otherPlanIndex] = { price, plan, card: { image: null }, count: 1 };
           } else {
-            items.push({ price, plan, count: 1 });
+            items.push({ price, plan, card: { image: null }, count: 1 });
           }
         }
       } else {
-        items.push({ price, plan, count: 1 });
+        items.push({ price, plan, card: { image: null }, count: 1 });
       }
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
       setCartCount(1);
@@ -92,7 +93,12 @@ const AddToCart = ({route, navigation}) => {
   };
 
   const goCart = async () => {
-    navigation.navigate('cart', { price: price, plan: plan });
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'cart' }],
+      })
+    );
     await loadCartCount();
     Animated.parallel([
       Animated.timing(opacity, {
