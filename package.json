@@ -17,6 +17,7 @@
     "@react-native-picker/picker": "^2.5.1",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.15",
+    "@stripe/stripe-react-native": "^0.35.0",
     "axios": "^1.6.0",
     "base-64": "^1.0.0",
     "graphql": "^16.8.1",

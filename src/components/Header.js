@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native';
 import Logo from '../assets/images/PNG/H_Sound_Trans_Gold_Logo.png';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import Menu from './Menu';
@@ -17,10 +17,13 @@ const Header = () => {
   const [activityData, setActivityData] = useState(null);
   const [error, setError] = useState(null);
   const [balanceVisible, setBalanceVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadUserData();
-    fetchData();
+    if (!userDetails || balance === 0) {
+      loadUserData();
+      fetchData();
+    }
   }, [userDetails, balance]);
 
   const loadUserData = async () => {
@@ -39,6 +42,7 @@ const Header = () => {
     const email = (userDetails) ? userDetails.email : '';
     const apiUrl = `https://app.shopwaive.com/api/customer/${encodeURIComponent(email)}`;
     try {
+      setLoading(true);
       const response = await axios.get(apiUrl, {
         headers: {
           'X-Shopwaive-Access-Token': config.shopwaiveAccessToken,
@@ -53,6 +57,8 @@ const Header = () => {
       }
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,14 +76,20 @@ const Header = () => {
           <Image source={Logo} style={styles.logo} />
         </View>
         <View style={styles.item}>
-          {balance > 0 ? (<><TouchableOpacity onPress={() => setBalanceVisible(true)}>
-            <View style={styles.balanceContainer}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <>
+            {balance > 0 && userDetails ? (<><TouchableOpacity onPress={() => setBalanceVisible(true)}>
+              <View style={styles.balanceContainer}>
+                <Text style={styles.balanceText}>Credits: {balance}</Text>
+              </View>
+            </TouchableOpacity></>):
+            (<><View style={styles.balanceContainer}>
               <Text style={styles.balanceText}>Credits: {balance}</Text>
-            </View>
-          </TouchableOpacity></>):
-          (<><View style={styles.balanceContainer}>
-            <Text style={styles.balanceText}>Credits: {balance}</Text>
-          </View></>)}
+            </View></>)}
+            </>
+          )}
         </View>
       </View>
     </View>

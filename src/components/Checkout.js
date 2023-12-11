@@ -15,6 +15,10 @@ import { Picker } from '@react-native-picker/picker';
 import config from './../config/config';
 import axios from 'axios';
 import Autocomplete from './Autocomplete';
+import Music from '../assets/images/music.png';
+import Toast from 'react-native-toast-message';
+import { CardField } from '@stripe/stripe-react-native';
+import { initStripe } from '@stripe/stripe-react-native';
 
 const Checkout = () => {
   const navigation = useNavigation();
@@ -40,15 +44,20 @@ const Checkout = () => {
   const [expirationDateError, setExpirationDateError] = useState('');
   const [securityCodeError, setSecurityCodeError] = useState('');
   const [cardHolderNameError, setCardHolderNameError] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [lastNameError, setLastNameError] = useState('');
   const [address, setAddress] = useState('');
   const [addressError, setAddressError] = useState('');
+  const [apartMent, setApartMent] = useState('');
   const [city, setCity] = useState('');
   const [cityError, setCityError] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [zipcodeError, setZipcodeError] = useState('');
   const [userDetails, setUserDetails] = useState(null);
+  useEffect(() => {
+    initStripe({ publishableKey: 'pk_test_51HSfFxGaBA9SVqWglCECzecjBajvPdfGGTkT2wxCokkA2jrbJCL2KimgZfPQxxhTEKPY2gV422xoyjaT0u9s4u3000rbX2rTel' });
+  }, []);
   useEffect(() => {
     const fetchCountries = async () => {
       try {
@@ -131,6 +140,89 @@ const Checkout = () => {
     return cartItems.reduce((total, item) => total + item.count, 0);
   };
 
+  const initiateCheckout = async () => {
+    const orderApiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/orders.json`;
+    const checkoutApiUrl = `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/checkouts.json`;
+    const addressApiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/customers/7616158728494/addresses.json`;
+    const headers = {
+      'X-Shopify-Access-Token': config.shopifyApiKey,
+      'Content-Type': 'application/json',
+    };
+    try {
+      const lineItems = cartItems.map(item => ({
+        variant_id: (item.card && item.card.id) ? item.card.id : 47024021897518,
+        quantity: item.count,
+        title: (item.card && item.card.title) ? item.card.title : item.plan,
+        price: Number(item.price).toFixed(2)
+      }));
+      const checkoutPayload = {
+        checkout: {
+          line_items: lineItems,
+          email: (userDetails) ? userDetails.email : email
+        },
+      };
+      const response = await axios.post(
+        checkoutApiUrl,
+        checkoutPayload,
+        { headers }
+      );
+      if (response.data) {
+        const orderPayload = {
+          line_items: lineItems,
+          billing_address: {
+            first_name: firstName,
+            last_name: lastName,
+            address1: address,
+            address2: apartMent,
+            city: city,
+            province: selectedStateValue,
+            country: selectedValue,
+            zip: zipcode
+          },
+          shipping_address: {
+            first_name: firstName,
+            last_name: lastName,
+            address1: address,
+            address2: apartMent,
+            city: city,
+            province: selectedStateValue,
+            country: selectedValue,
+            zip: zipcode
+          },
+          email: (userDetails) ? userDetails.email : email,
+          transactions: [
+            {
+              kind: 'sale',
+              amount: cartItems.reduce((total, item) => total + (item.count * Number(item.price)), 0),
+              gateway: 'shopify_payments',
+            },
+          ]
+        };
+        const response = await axios.post(
+          orderApiUrl,
+          { order: orderPayload },
+          { headers }
+        );
+        const orderData = response.data.order;
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Order created successfully',
+          text2: 'You have successfully ordered!',
+        });
+        navigation.navigate('confirm', { orders: orderData })
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Order Failed',
+        text2: 'Failed'
+      });
+      console.error('Error initiating checkout:', error);
+    }
+  };
+
   const handlePayNow = () => {
     let errors = {};
     if (userDetails === null) {
@@ -138,37 +230,12 @@ const Checkout = () => {
         errors.email = 'Enter an email or phone number';
       }
     }
-    if (selectedOption === 'creditCard') {
-      if (!/^\d{16}$/.test(cardNumber)) {
-        errors.cardNumber = 'Enter a valid 16-digit credit card number';
-      }
-      const currentYear = new Date().getFullYear() % 100;
-      const currentMonth = new Date().getMonth() + 1;
-      const [inputMonth, inputYear] = expirationDate.split('/').map((value) => parseInt(value, 10));
-      if (
-        !/^\d{2}\/\d{2}$/.test(expirationDate) ||
-        isNaN(inputMonth) ||
-        isNaN(inputYear) ||
-        inputMonth < 1 ||
-        inputMonth > 12 ||
-        inputYear < currentYear ||
-        (inputYear === currentYear && inputMonth < currentMonth)
-      ) {
-        errors.expirationDate = 'Enter a valid expiration date (MM/YY)';
-      }
-      if (!/^\d{3,4}$/.test(securityCode)) {
-        errors.securityCode = 'Enter a valid 3 or 4-digit security code';
-      }
-      if (!cardHolderName.trim()) {
-        errors.cardHolderName = 'Enter your name exactly as it’s written on your card';
-      }
-    }
     if (!lastName.trim()) {
       errors.lastName = 'Enter a last name';
     }
-    // if (!address.trim()) {
-    //   errors.address = 'Enter an address';
-    // }
+    if (!address.trim()) {
+      errors.address = 'Enter an address';
+    }
     if (!city.trim()) {
       errors.city = 'Enter a city';
     }
@@ -177,18 +244,16 @@ const Checkout = () => {
     }
     if (Object.keys(errors).length > 0) {
       setEmailError(errors.email || '');
-      setCardNumberError(errors.cardNumber || '');
-      setExpirationDateError(errors.expirationDate || '');
-      setSecurityCodeError(errors.securityCode || '');
-      setCardHolderNameError(errors.cardHolderName || '');
       setLastNameError(errors.lastName || '');
-      // setAddressError(errors.address || '');
+      setAddressError(errors.address || '');
       setCityError(errors.city || '');
       setZipcodeError(errors.zipcode || '');
       return;
     } else {
       if (selectedOption === 'paypal') {
         navigation.navigate('paypal', { paypalPrice: calculateEstimatedTotal() })
+      } else if (selectedOption === 'creditCard') {
+        initiateCheckout();
       }
     }
   };
@@ -217,7 +282,13 @@ const Checkout = () => {
             {cartItems.map((item, index) => (
               <View key={index} style={styles.listItem}>
                 <View style={styles.itemImageContainer}>
-                  <Image source={Dummy} style={styles.itemImage} />
+                  {item.card.image && item.card.image.src ? (
+                    <Image style={styles.itemImage} source={{ uri: item.card.image.src }} />
+                  ) : item.card.image === null ? (
+                    <Image source={Dummy} style={styles.itemImage} />
+                  ) : (
+                    <Image style={styles.itemImage} source={Music} />
+                  )}
                   <Text style={styles.itemCount}>{item.count}</Text>
                 </View>
                 <View style={styles.itemDetails}>
@@ -315,73 +386,26 @@ const Checkout = () => {
             />
             {selectedOption === 'creditCard' && (
               <View style={styles.additionalDetails}>
-                <TextInput
-                  style={[
-                    styles.inputFieldCard,
-                    { borderColor: cardNumberError ? 'red' : '#ddd' }
-                  ]}
-                  placeholder="Card number"
-                  placeholderTextColor="#000"
-                  value={cardNumber}
-                  onChangeText={(text) => {
-                    setCardNumber(text);
-                    setCardNumberError('');
+                <CardField
+                  postalCodeEnabled={false}
+                  placeholders={{
+                    number: 'Card Number',
+                  }}
+                  cardStyle={{
+                    backgroundColor: '#FFFFFF',
+                    textColor: '#000000',
+                  }}
+                  style={{
+                    width: '100%',
+                    height: 50
+                  }}
+                  onCardChange={(cardDetails) => {
+                    console.log('cardDetails', cardDetails);
+                  }}
+                  onFocus={(focusedField) => {
+                    console.log('focusField', focusedField);
                   }}
                 />
-                {cardNumberError ? (
-                  <Text style={styles.errorText}>{cardNumberError}</Text>
-                ) : null}
-                <TextInput
-                  style={[
-                    styles.inputFieldCard,
-                    { borderColor: expirationDateError ? 'red' : '#ddd' }
-                  ]}
-                  placeholder="Expiration date (MM / YY)"
-                  placeholderTextColor="#000"
-                  value={expirationDate}
-                  onChangeText={(text) => {
-                    if (text.length === 2 && expirationDate.length === 1 && text > expirationDate) {
-                      text += '/';
-                    }
-                    setExpirationDate(text);
-                    setExpirationDateError('');
-                  }}
-                />
-                {expirationDateError ? (
-                  <Text style={styles.errorText}>{expirationDateError}</Text>
-                ) : null}
-                <TextInput
-                  style={[
-                    styles.inputFieldCard,
-                    { borderColor: securityCodeError ? 'red' : '#ddd' }
-                  ]}
-                  placeholder="Security code"
-                  placeholderTextColor="#000"
-                  value={securityCode}
-                  onChangeText={(text) => {
-                    setSecurityCode(text);
-                    setSecurityCodeError('');
-                  }}
-                />
-                {securityCodeError ? (
-                  <Text style={styles.errorText}>{securityCodeError}</Text>
-                ) : null}
-                <TextInput
-                  style={[
-                    styles.inputFieldCard,
-                    { borderColor: cardHolderNameError ? 'red' : '#ddd' }
-                  ]}
-                  placeholder="Name on card"
-                  placeholderTextColor="#000"
-                  value={cardHolderName}
-                  onChangeText={(text) => {
-                    setCardHolderName(text);
-                    setCardHolderNameError('');
-                  }}
-                />
-                {cardHolderNameError ? (
-                  <Text style={styles.errorText}>{cardHolderNameError}</Text>
-                ) : null}
               </View>
             )}
           </View>
@@ -407,6 +431,10 @@ const Checkout = () => {
               style={styles.inputFieldBill}
               placeholder="First name (optional)"
               placeholderTextColor="#000"
+              value={firstName}
+              onChangeText={(text) => {
+                setFirstName(text);
+              }}
             />
             <TextInput
               style={[
@@ -424,7 +452,22 @@ const Checkout = () => {
             {lastNameError ? (
               <Text style={styles.errorOuterBillText}>{lastNameError}</Text>
             ) : null}
-            <Autocomplete selectedCountry={selectedValue}/>
+            <TextInput
+              style={[
+                styles.inputFieldBill,
+                { borderColor: addressError ? 'red' : '#ddd' }
+              ]}
+              placeholder="Address"
+              placeholderTextColor="#000"
+              value={address}
+              onChangeText={(text) => {
+                setAddress(text);
+                setAddressError('');
+              }}
+            />
+            {addressError ? (
+              <Text style={styles.errorOuterBillText}>{addressError}</Text>
+            ) : null}
             {!showApartment ? (<><View style={styles.apartment}>
               <TouchableOpacity onPress={showApartments}>
                 <FontAwesome6 name='plus' color="#abaf51" size={12} />
@@ -441,6 +484,10 @@ const Checkout = () => {
                 ]}
                 placeholder="Apartment, suite, etc. (optional)"
                 placeholderTextColor="#000"
+                value={apartment}
+                onChangeText={(text) => {
+                  setApartMent(text);
+                }}
               />
             )}
             <TextInput
@@ -507,7 +554,13 @@ const Checkout = () => {
               {cartItems.map((item, index) => (
                 <View key={index} style={styles.listItem}>
                   <View style={styles.itemImageContainer}>
-                    <Image source={Dummy} style={styles.itemImage} />
+                    {item.card.image && item.card.image.src ? (
+                      <Image style={styles.itemImage} source={{ uri: item.card.image.src }} />
+                    ) : item.card.image === null ? (
+                      <Image source={Dummy} style={styles.itemImage} />
+                    ) : (
+                      <Image style={styles.itemImage} source={Music} />
+                    )}
                     <Text style={styles.itemCount}>{item.count}</Text>
                   </View>
                   <View style={styles.itemDetails}>
@@ -537,7 +590,7 @@ const Checkout = () => {
           </View>
         </View>
         <View style={styles.cardFooter}>
-          <Text style={styles.footerText}>All rights reserved Clean AI</Text>
+          <Text style={styles.footerText}>All rights reserved VRenity</Text>
         </View>
       </ScrollView>
     </> 

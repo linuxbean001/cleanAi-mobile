@@ -42,7 +42,7 @@ const Footer = () => {
 
         <View style={styles.detailsContent}>
           <Text style={styles.detailsContentText}>
-            Welcome to CLEAN AI Technologies Inc., a hub for{' '}
+            Welcome to VRenity Technologies Inc., a hub for{' '}
           </Text>
           <Text style={styles.detailsContentText}>
             AI innovation and experiential design.
@@ -89,7 +89,7 @@ const Footer = () => {
       <View style={styles.copyrightContainer}>
         <Text style={styles.copyright}>© 2023, </Text>
         <TouchableOpacity>
-          <Text style={styles.copyright}>Clean AI </Text>
+          <Text style={styles.copyright}>VRenity </Text>
         </TouchableOpacity>
         <Text style={styles.copyright}>LLC</Text>
       </View>
