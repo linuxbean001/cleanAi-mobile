@@ -22,7 +22,7 @@ import { CardField } from '@stripe/stripe-react-native';
 import { initStripe } from '@stripe/stripe-react-native';
 
 const Checkout = ({ route }) => {
-  // console.log(route.params.orders.confirmation_number)
+  const ordersData = route.params
   const navigation = useNavigation();
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -52,11 +52,16 @@ const Checkout = ({ route }) => {
   const calculateEstimatedTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.count, 0);
   };
+  const calculateEstimatedCount = () => {
+    return cartItems.reduce((total, item) => total + item.count, 0);
+  };
   return (
     <>
       <ScrollView>
         <View style={styles.cardTop}>
-          <Image source={Logo} style={styles.logo} />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image source={Logo} style={styles.logo} />
+          </TouchableOpacity>  
         </View>
         <View style={styles.shopPrices}>
           <TouchableOpacity onPress={toggleOrderSummary}>
@@ -101,8 +106,12 @@ const Checkout = ({ route }) => {
               <FontAwesome6 name='check-circle' color="#abaf51" size={50} />
             </View>
             <View>
-              <Text style={styles.orderConfirm}>Confirmation #1234564</Text>
-              <Text style={styles.orderUser}>Thank you, User!</Text>
+              <Text style={styles.orderConfirm}>Confirmation #{ordersData.orders.confirmation_number}</Text>
+              {userDetails ? (
+                <Text style={styles.orderUser}>Thank you, {userDetails.firstName}!</Text>
+              ) : (
+                <></>
+              )}
             </View>
           </View>
           <View>
@@ -111,14 +120,18 @@ const Checkout = ({ route }) => {
                 Your order is confirmed.
               </Text>
               <Text style={{marginBottom: 10, fontSize: 16, color: '#000'}}>
-                You’ll receive an email when your order is ready.
+                You’ll receive a confirmation email with your order number shortly.
               </Text>
-              <CheckBox
-                checked={check1}
-                onPress={() => setCheck1(!check1)}
-                title="Email me with news and offers"
-                titleProps={{ style: styles.checkboxTitle }}
-              />
+              {!ordersData.orders.customer.verified_email ? (
+                <CheckBox
+                  checked={check1}
+                  onPress={() => setCheck1(!check1)}
+                  title="Email me with news and offers"
+                  titleProps={{ style: styles.checkboxTitle }}
+                />
+              ):(
+                <></>
+              )}
             </Card>
             <Card>
               <Text style={{marginBottom: 10, fontSize: 20, color: '#000'}}>
@@ -127,9 +140,13 @@ const Checkout = ({ route }) => {
               <Text style={{marginBottom: 10, fontSize: 16, color: '#000'}}>
                 Contact information
               </Text>
-              <Text style={{marginBottom: 10, fontSize: 15, color: '#000'}}>
-                rahuls.linuxbean@gmail.com
-              </Text>
+              {userDetails ? (
+                <Text style={{marginBottom: 10, fontSize: 15, color: '#000'}}>
+                  {userDetails.email}
+                </Text>
+              ) : (
+                <></>
+              )}
               <View style={ styles.paymentMethod }>
                 <Text style={{marginBottom: 10, fontSize: 16, color: '#000'}}>
                   Payment method
@@ -137,26 +154,26 @@ const Checkout = ({ route }) => {
                 <View style={ styles.paymentMethodText }>
                   <Image source={CreditCard}/>
                   <Text style={{marginLeft: 10, marginBottom: 10, fontSize: 16, color: '#000'}}>
-                     ending with 1 - $20.00
+                     ending with ${calculateEstimatedCount()} - ${calculateEstimatedTotal().toFixed(2)}
                   </Text>
                 </View>
               </View>
-              <View style={ styles.paymentMethod }>
+              <View>
                 <Text style={{marginBottom: 10, fontSize: 16, color: '#000'}}>
                   Billing address
                 </Text>
                 <View>
                   <Text style={ styles.billingAddressText }>
-                    Rahul Solanki
+                    {ordersData.orders.billing_address.name}
                   </Text>
                   <Text style={ styles.billingAddressText }>
-                    International Terminali
+                    {ordersData.orders.billing_address.address1}
                   </Text>
                   <Text style={ styles.billingAddressText }>
-                    Brisbane Airport QLD 4008
+                    {ordersData.orders.billing_address.city} {ordersData.orders.billing_address.province} {ordersData.orders.billing_address.zip}
                   </Text>
                   <Text style={ styles.billingAddressText }>
-                    Australia
+                    {ordersData.orders.billing_address.country}
                   </Text>
                 </View>
               </View>
@@ -342,6 +359,14 @@ const styles = StyleSheet.create({
     width: 130,
     height: 50,
     right: 10
+  },
+  paymentMethod: {
+    marginTop: 20,
+    marginBottom: 20
+  },
+  paymentMethodText: {
+    flexDirection: 'row',
+    alignContent: 'flex-start'
   }
 });
 

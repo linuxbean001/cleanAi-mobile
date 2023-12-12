@@ -150,7 +150,7 @@ const Checkout = () => {
     };
     try {
       const lineItems = cartItems.map(item => ({
-        variant_id: (item.card && item.card.id) ? item.card.id : 47024021897518,
+        variant_id: item.card.variants[0].id,
         quantity: item.count,
         title: (item.card && item.card.title) ? item.card.title : item.plan,
         price: Number(item.price).toFixed(2)

@@ -6,7 +6,7 @@ import Footer from './Footer';
 import {useNavigation,CommonActions} from '@react-navigation/native';
 
 const AddToCart = ({route, navigation}) => {
-  const { price, plan } = route.params;
+  const { price, plan, card } = route.params;
   const [isModalVisible, setModalVisible] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-300)).current;
@@ -31,7 +31,7 @@ const AddToCart = ({route, navigation}) => {
     }
   };
 
-  const saveCartItem = async (price, plan) => {
+  const saveCartItem = async (price, plan, card) => {
     try {
       let items = [];
       const cartItems = await AsyncStorage.getItem('cartItems');
@@ -39,17 +39,17 @@ const AddToCart = ({route, navigation}) => {
         items = JSON.parse(cartItems);
         const existingItemIndex = items.findIndex((item) => item.plan === plan);
         if (existingItemIndex !== -1) {
-          items[existingItemIndex] = { price, plan, card: { image: null }, count: 1 };
+          items[existingItemIndex] = { price, plan, card: card, count: 1 };
         } else {
           const otherPlanIndex = items.findIndex((item) => item.plan !== plan);
           if (otherPlanIndex !== -1) {
-            items[otherPlanIndex] = { price, plan, card: { image: null }, count: 1 };
+            items[otherPlanIndex] = { price, plan, card: card, count: 1 };
           } else {
-            items.push({ price, plan, card: { image: null }, count: 1 });
+            items.push({ price, plan, card: card, count: 1 });
           }
         }
       } else {
-        items.push({ price, plan, card: { image: null }, count: 1 });
+        items.push({ price, plan, card: card, count: 1 });
       }
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
       setCartCount(1);
@@ -74,7 +74,7 @@ const AddToCart = ({route, navigation}) => {
         }),
       ]).start(() => setModalVisible(false));
     } else {
-      saveCartItem(price, plan);
+      saveCartItem(price, plan, card);
       await loadCartCount();
       setModalVisible(true);
       Animated.parallel([

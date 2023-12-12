@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {useNavigation} from '@react-navigation/native';
 
-const PlansCard = ({ title, description, price }) => {
+const PlansCard = ({ title, description, price, card }) => {
   const navigation = useNavigation();
   return (
     <View style={styles.card}>
@@ -19,7 +19,7 @@ const PlansCard = ({ title, description, price }) => {
       </View>
       <View style={styles.cardBtn}>
         <TouchableOpacity
-          onPress={()=>navigation.navigate('addtocart', { price: price, plan: title })}
+          onPress={()=>navigation.navigate('addtocart', { price: price, plan: title, card: card })}
           style={styles.selectBtn}>
           <Text style={styles.selectText}>Select</Text>
         </TouchableOpacity>
