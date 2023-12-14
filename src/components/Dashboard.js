@@ -18,6 +18,7 @@ import config from './../config/config';
 const Dashboard = () => {
   const navigation = useNavigation();
   const [orderData, setOrderData] = useState([]);
+  const [addressData, setAddressData] = useState([]);
   const [userDetails, setUserDetails] = useState(null);
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,7 +72,31 @@ const Dashboard = () => {
       }
     };
 
+    const fetchAddresses = async () => {
+      try {
+        setLoading(true);
+        if (userId) {
+          const endpoint = `/admin/api/${config.apiVersion}/customers/${userId}/addresses.json`;
+          const response = await axios.get(`${config.shopifyStoreUrl}${endpoint}`, {
+            headers: {
+              'X-Shopify-Access-Token': config.shopifyApiKey,
+            },
+          });
+
+          if (response.data.addresses) {
+            const addresses = response.data.addresses;
+            setAddressData(addresses);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchOrders();
+    fetchAddresses();
   }, [userId]);
 
   return (
@@ -129,7 +154,13 @@ const Dashboard = () => {
             </View>
           )}
           <TouchableOpacity>
-            <Text style={styles.detailText}>View addresses (0)</Text>
+            <Text style={styles.detailText}>View addresses 
+              {loading ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <> ({addressData.length})</>
+              )}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, Image, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Header from './Header';
 import Footer from './Footer';
@@ -36,14 +36,6 @@ const Checkout = () => {
   const [statesShow, setStatesShow] = useState(true);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expirationDate, setExpirationDate] = useState('');
-  const [securityCode, setSecurityCode] = useState('');
-  const [cardHolderName, setCardHolderName] = useState('');
-  const [cardNumberError, setCardNumberError] = useState('');
-  const [expirationDateError, setExpirationDateError] = useState('');
-  const [securityCodeError, setSecurityCodeError] = useState('');
-  const [cardHolderNameError, setCardHolderNameError] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [lastNameError, setLastNameError] = useState('');
@@ -55,12 +47,14 @@ const Checkout = () => {
   const [zipcode, setZipcode] = useState('');
   const [zipcodeError, setZipcodeError] = useState('');
   const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     initStripe({ publishableKey: 'pk_test_51HSfFxGaBA9SVqWglCECzecjBajvPdfGGTkT2wxCokkA2jrbJCL2KimgZfPQxxhTEKPY2gV422xoyjaT0u9s4u3000rbX2rTel' });
   }, []);
   useEffect(() => {
     const fetchCountries = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(
           `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/countries.json`, 
           {
@@ -71,17 +65,56 @@ const Checkout = () => {
         );
         const countriesData = response.data.countries.map(country => ({
           label: country.name,
-          value: country.code,
+          value: country.name,
           provinces: country.provinces
         }));
         setCountries(countriesData);
       } catch (error) {
         console.error('Error fetching countries:', error);
+      } finally {
+        setLoading(true);
       }
     };
     fetchCountries();
     loadCartItems();
-  }, []);
+  }, [userDetails]);
+
+  useEffect(() => {
+    const loadUserDetails = async () => {
+      try {
+        const userDetail = await AsyncStorage.getItem('userDetail');
+        if (userDetail) {
+          const parsedUser = userDetail ? JSON.parse(userDetail) : {};
+          setUserDetails(parsedUser);
+          if (!firstName && parsedUser.firstName) {
+            setFirstName(parsedUser.firstName);
+          }
+          if (!lastName && parsedUser.lastName) {
+            setLastName(parsedUser.lastName);
+          }
+          if (!address && parsedUser.defaultAddress && parsedUser.defaultAddress.address1) {
+            setAddress(parsedUser.defaultAddress.address1);
+          }
+          if (!city && parsedUser.defaultAddress && parsedUser.defaultAddress.city) {
+            setCity(parsedUser.defaultAddress.city);
+          }
+          if (!selectedValue && parsedUser.defaultAddress && parsedUser.defaultAddress.country) {
+            setSelectedValue(parsedUser.defaultAddress.country);
+            handleCountryChange(parsedUser.defaultAddress.country);
+          }
+          if (!selectedStateValue && parsedUser.defaultAddress && parsedUser.defaultAddress.province) {
+            setSelectedStateValue(parsedUser.defaultAddress.province);
+          }
+          if (!zipcode && parsedUser.defaultAddress && parsedUser.defaultAddress.zip) {
+            setZipcode(parsedUser.defaultAddress.zip);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user details:', error);
+      }
+    };
+    loadUserDetails();
+  }, [firstName, lastName, address, city, selectedValue, selectedStateValue, zipcode]);
 
   const handleCountryChange = async (countryCode) => {
     try {
@@ -90,7 +123,7 @@ const Checkout = () => {
         if (selectedCountry.provinces && selectedCountry.provinces.length > 0) {
           const statesData = selectedCountry.provinces.map(province => ({
             label: province.name,
-            value: province.code,
+            value: province.name,
           }));
           setStates(statesData);
           setStatesShow(true);
@@ -413,20 +446,24 @@ const Checkout = () => {
             <Text style={styles.billingText}>Billing address</Text>
           </View>
           <View style={styles.billingDetails}>
-            <View style={styles.countryBox}>
-              <Picker
-                style={{ height: 50, width: 380, color: '#000' }}
-                selectedValue={selectedValue}
-                onValueChange={(itemValue, itemIndex) => {
-                  setSelectedValue(itemValue);
-                  handleCountryChange(itemValue);
-                }}
-              >
-                {countries.map((country, index) => (
-                  <Picker.Item key={index} label={country.label} value={country.value} />
-                ))}
-              </Picker>
-            </View>
+            {loading ? (
+              <ActivityIndicator size="medium" color="#0000ff" />
+            ) : (
+             <><View style={styles.countryBox}>
+                <Picker
+                  style={{ height: 50, width: 380, color: '#000' }}
+                  selectedValue={selectedValue}
+                  onValueChange={(itemValue, itemIndex) => {
+                    setSelectedValue(itemValue);
+                    handleCountryChange(itemValue);
+                  }}
+                >
+                  {countries.map((country, index) => (
+                    <Picker.Item key={index} label={country.label} value={country.value} />
+                  ))}
+                </Picker>
+              </View></>
+            )}
             <TextInput
               style={styles.inputFieldBill}
               placeholder="First name (optional)"
@@ -484,7 +521,7 @@ const Checkout = () => {
                 ]}
                 placeholder="Apartment, suite, etc. (optional)"
                 placeholderTextColor="#000"
-                value={apartment}
+                value={apartMent}
                 onChangeText={(text) => {
                   setApartMent(text);
                 }}
