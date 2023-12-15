@@ -54,7 +54,6 @@ const Checkout = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        setLoading(true);
         const response = await axios.get(
           `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/countries.json`, 
           {
@@ -71,8 +70,6 @@ const Checkout = () => {
         setCountries(countriesData);
       } catch (error) {
         console.error('Error fetching countries:', error);
-      } finally {
-        setLoading(true);
       }
     };
     fetchCountries();
@@ -174,6 +171,8 @@ const Checkout = () => {
   };
 
   const initiateCheckout = async () => {
+    setLoading(true);
+    let orderData;
     const orderApiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/orders.json`;
     const checkoutApiUrl = `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/checkouts.json`;
     const addressApiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/customers/7616158728494/addresses.json`;
@@ -236,16 +235,10 @@ const Checkout = () => {
           { order: orderPayload },
           { headers }
         );
-        const orderData = response.data.order;
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          text1: 'Order created successfully',
-          text2: 'You have successfully ordered!',
-        });
-        navigation.navigate('confirm', { orders: orderData })
+        orderData = response.data.order;
       }
     } catch (error) {
+      setLoading(false);
       Toast.show({
         type: 'error',
         position: 'top',
@@ -253,6 +246,17 @@ const Checkout = () => {
         text2: 'Failed'
       });
       console.error('Error initiating checkout:', error);
+    } finally {
+      setLoading(false);
+      if (orderData) {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Order created successfully',
+          text2: 'You have successfully ordered!',
+        });
+        navigation.navigate('confirm', { orders: orderData });
+      }
     }
   };
 
@@ -292,7 +296,13 @@ const Checkout = () => {
   };
   return (
     <>
-      <ScrollView>
+      {loading ? (
+        <><View style={styles.loadContainer}>
+          <ActivityIndicator size="large" color="#abaf51" />
+          <Text style={styles.loadText}>Please wait...</Text>
+        </View></>
+      ) : (
+      <><ScrollView>
         <View style={styles.cardTop}>
           <Text style={styles.yourCart}>VRenity</Text>
           <TouchableOpacity onPress={()=>navigation.navigate('cart')}>
@@ -446,24 +456,20 @@ const Checkout = () => {
             <Text style={styles.billingText}>Billing address</Text>
           </View>
           <View style={styles.billingDetails}>
-            {loading ? (
-              <ActivityIndicator size="medium" color="#0000ff" />
-            ) : (
-             <><View style={styles.countryBox}>
-                <Picker
-                  style={{ height: 50, width: 380, color: '#000' }}
-                  selectedValue={selectedValue}
-                  onValueChange={(itemValue, itemIndex) => {
-                    setSelectedValue(itemValue);
-                    handleCountryChange(itemValue);
-                  }}
-                >
-                  {countries.map((country, index) => (
-                    <Picker.Item key={index} label={country.label} value={country.value} />
-                  ))}
-                </Picker>
-              </View></>
-            )}
+            <View style={styles.countryBox}>
+              <Picker
+                style={{ height: 50, width: 380, color: '#000' }}
+                selectedValue={selectedValue}
+                onValueChange={(itemValue, itemIndex) => {
+                  setSelectedValue(itemValue);
+                  handleCountryChange(itemValue);
+                }}
+              >
+                {countries.map((country, index) => (
+                  <Picker.Item key={index} label={country.label} value={country.value} />
+                ))}
+              </Picker>
+            </View>
             <TextInput
               style={styles.inputFieldBill}
               placeholder="First name (optional)"
@@ -629,7 +635,8 @@ const Checkout = () => {
         <View style={styles.cardFooter}>
           <Text style={styles.footerText}>All rights reserved VRenity</Text>
         </View>
-      </ScrollView>
+      </ScrollView></>
+      )}
     </> 
   );
 };
@@ -969,6 +976,15 @@ const styles = StyleSheet.create({
   },
   apartSummary: {
     fontSize: 16,
+    color: '#abaf51'
+  },
+  loadContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  loadText: {
+    fontSize: 20,
     color: '#abaf51'
   }
 });

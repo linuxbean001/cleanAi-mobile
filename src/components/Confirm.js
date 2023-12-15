@@ -154,7 +154,7 @@ const Checkout = ({ route }) => {
                 <View style={ styles.paymentMethodText }>
                   <Image source={CreditCard}/>
                   <Text style={{marginLeft: 10, marginBottom: 10, fontSize: 16, color: '#000'}}>
-                     ending with ${calculateEstimatedCount()} - ${calculateEstimatedTotal().toFixed(2)}
+                     ending with {calculateEstimatedCount()} - ${calculateEstimatedTotal().toFixed(2)}
                   </Text>
                 </View>
               </View>
@@ -182,6 +182,7 @@ const Checkout = ({ route }) => {
         </View>
         <View style={styles.cardPayment}>
           <TouchableOpacity
+            onPress={()=>navigation.navigate('songs')}
             style={styles.shoppingBtn}>
             <Text style={styles.shoppingText}>Continue shopping</Text>
           </TouchableOpacity>
