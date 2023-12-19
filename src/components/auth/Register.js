@@ -71,11 +71,12 @@ const Register = () => {
             last_name: lastName,
             email,
             password,
-            password_confirmation: password
+            password_confirmation: password,
+            accepts_marketing: true
           },
         };
         const response = await axios.post(
-          `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/customers.json`,
+          `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/customers.json`,
           customerData,
           {
             headers: {

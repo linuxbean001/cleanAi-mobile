@@ -34,7 +34,7 @@ const Songs = () => {
 
   useEffect(() => {
     loadUserData();
-    fetchData();
+    // fetchData();
     loadCartCount();
   }, [userDetails]);
 
@@ -50,24 +50,24 @@ const Songs = () => {
     }
   };
 
-  const fetchData = async () => {
-    const email = (userDetails) ? userDetails.email : '';
-    const apiUrl = `https://app.shopwaive.com/api/customer/${encodeURIComponent(email)}`;
-    try {
-      const response = await axios.get(apiUrl, {
-        headers: {
-          'X-Shopwaive-Access-Token': config.shopwaiveAccessToken,
-          'X-Shopwaive-Platform': config.shopwaivePlatform,
-          'Content-Type': 'application/json'
-        },
-      });
-      const fetchedBalance = response.data;
-      setBalanceData(fetchedBalance);
-      setBalance(fetchedBalance.balance);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+  // const fetchData = async () => {
+  //   const email = (userDetails) ? userDetails.email : '';
+  //   const apiUrl = `https://app.shopwaive.com/api/customer/${encodeURIComponent(email)}`;
+  //   try {
+  //     const response = await axios.get(apiUrl, {
+  //       headers: {
+  //         'X-Shopwaive-Access-Token': config.shopwaiveAccessToken,
+  //         'X-Shopwaive-Platform': config.shopwaivePlatform,
+  //         'Content-Type': 'application/json'
+  //       },
+  //     });
+  //     const fetchedBalance = response.data;
+  //     setBalanceData(fetchedBalance);
+  //     setBalance(fetchedBalance.balance);
+  //   } catch (error) {
+  //     setError(error.message);
+  //   }
+  // };
 
   useEffect(() => {
     const endpoint = `/admin/api/${config.apiVersion}/products.json`;

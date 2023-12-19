@@ -48,6 +48,7 @@ const Checkout = () => {
   const [zipcodeError, setZipcodeError] = useState('');
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState('');
   useEffect(() => {
     initStripe({ publishableKey: 'pk_test_51HSfFxGaBA9SVqWglCECzecjBajvPdfGGTkT2wxCokkA2jrbJCL2KimgZfPQxxhTEKPY2gV422xoyjaT0u9s4u3000rbX2rTel' });
   }, []);
@@ -69,7 +70,7 @@ const Checkout = () => {
         }));
         setCountries(countriesData);
       } catch (error) {
-        console.error('Error fetching countries:', error);
+        // console.error('Error fetching countries:', error);
       }
     };
     fetchCountries();
@@ -83,6 +84,12 @@ const Checkout = () => {
         if (userDetail) {
           const parsedUser = userDetail ? JSON.parse(userDetail) : {};
           setUserDetails(parsedUser);
+          if (parsedUser && parsedUser.id) {
+            const gid = parsedUser.id;
+            const parts = gid.split('/');
+            const id = parts[parts.length - 1];
+            setUserId(id);
+          }
           if (!firstName && parsedUser.firstName) {
             setFirstName(parsedUser.firstName);
           }
@@ -175,7 +182,6 @@ const Checkout = () => {
     let orderData;
     const orderApiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/orders.json`;
     const checkoutApiUrl = `${config.shopifyStoreUrl}/admin/api/${config.apiVersion}/checkouts.json`;
-    const addressApiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/customers/7616158728494/addresses.json`;
     const headers = {
       'X-Shopify-Access-Token': config.shopifyApiKey,
       'Content-Type': 'application/json',
@@ -222,6 +228,7 @@ const Checkout = () => {
             zip: zipcode
           },
           email: (userDetails) ? userDetails.email : email,
+          send_receipt: true,
           transactions: [
             {
               kind: 'sale',
@@ -294,6 +301,58 @@ const Checkout = () => {
       }
     }
   };
+  const updateEmail = () => {
+    if (userId) {
+      setCheck1(!check1)
+      const apiUrl = `${config.shopifyStoreUrlAudio}/admin/api/${config.apiVersion}/customers/${userId}.json`;
+      const currentDate = new Date();
+      const formattedDateTime = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${currentDate
+        .getDate()
+        .toString()
+        .padStart(2, '0')} ${currentDate
+        .getHours()
+        .toString()
+        .padStart(2, '0')}:${currentDate
+        .getMinutes()
+        .toString()
+        .padStart(2, '0')}:${currentDate.getSeconds().toString().padStart(2, '0')}`;
+      const inputDate = new Date(formattedDateTime);
+      let formattedDateTimeString;
+      if (!isNaN(inputDate.getTime())) {
+        formattedDateTimeString = inputDate.toISOString();
+      }
+      const requestData = {
+        customer: {
+          id: userId,
+          accepts_marketing: true,
+          accepts_marketing_updated_at: formattedDateTimeString,
+          marketing_opt_in_level: 'confirmed_opt_in',
+        }
+      };
+      fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'X-Shopify-Access-Token': config.shopifyApiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData),
+      }).then(response => response.json())
+      .then(data => {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Subscribed',
+          text2: 'Subscribe successfully!',
+        });
+        console.log('API response:', data);
+      })
+      .catch(error => {
+        console.error('API error:', error);
+      });
+    }
+  }
   return (
     <>
       {loading ? (
@@ -394,12 +453,16 @@ const Checkout = () => {
             ) : null}
           </View></>)}
           <View>
-            <CheckBox
-              checked={check1}
-              onPress={() => setCheck1(!check1)}
-              title="Email me with news and offers"
-              titleProps={{ style: styles.checkboxTitle }}
-            />
+            {userDetails && !userDetails.acceptsMarketing ? (
+              <CheckBox
+                checked={check1}
+                onPress={() => updateEmail()}
+                title="Email me with news and offers"
+                titleProps={{ style: styles.checkboxTitle }}
+              />
+            ):(
+              <></>
+            )}
           </View>
         </View>
         <View style={styles.cardPayment}>

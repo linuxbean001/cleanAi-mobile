@@ -22,7 +22,7 @@ const Header = () => {
   useEffect(() => {
     if (!userDetails || balance === 0) {
       loadUserData();
-      fetchData();
+      // fetchData();
     }
   }, [userDetails, balance]);
 
@@ -38,29 +38,29 @@ const Header = () => {
     }
   };
 
-  const fetchData = async () => {
-    const email = (userDetails) ? userDetails.email : '';
-    const apiUrl = `https://app.shopwaive.com/api/customer/${encodeURIComponent(email)}`;
-    try {
-      setLoading(true);
-      const response = await axios.get(apiUrl, {
-        headers: {
-          'X-Shopwaive-Access-Token': config.shopwaiveAccessToken,
-          'X-Shopwaive-Platform': config.shopwaivePlatform,
-          'Content-Type': 'application/json'
-        },
-      });
-      const fetchedBalance = response.data;
-      if (fetchedBalance.status !== 'Customer not found') {
-        setActivityData(fetchedBalance.activity);
-        setBalance(fetchedBalance.balance);
-      }
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchData = async () => {
+  //   const email = (userDetails) ? userDetails.email : '';
+  //   const apiUrl = `https://app.shopwaive.com/api/customer/${encodeURIComponent(email)}`;
+  //   try {
+  //     setLoading(true);
+  //     const response = await axios.get(apiUrl, {
+  //       headers: {
+  //         'X-Shopwaive-Access-Token': config.shopwaiveAccessToken,
+  //         'X-Shopwaive-Platform': config.shopwaivePlatform,
+  //         'Content-Type': 'application/json'
+  //       },
+  //     });
+  //     const fetchedBalance = response.data;
+  //     if (fetchedBalance.status !== 'Customer not found') {
+  //       setActivityData(fetchedBalance.activity);
+  //       setBalance(fetchedBalance.balance);
+  //     }
+  //   } catch (error) {
+  //     setError(error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>

@@ -111,6 +111,7 @@ const Login = () => {
           firstName
           lastName
           email
+          acceptsMarketing
           defaultAddress {
             id
             address1

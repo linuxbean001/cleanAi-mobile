@@ -122,7 +122,7 @@ const Checkout = ({ route }) => {
               <Text style={{marginBottom: 10, fontSize: 16, color: '#000'}}>
                 You’ll receive a confirmation email with your order number shortly.
               </Text>
-              {!ordersData.orders.customer.verified_email ? (
+              {userDetails && !userDetails.acceptsMarketing ? (
                 <CheckBox
                   checked={check1}
                   onPress={() => setCheck1(!check1)}
